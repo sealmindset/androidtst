@@ -1,102 +1,36 @@
 # Roadmap: Android Test Harness
 
-## Overview
+## Milestones
 
-Transform the SleepIQ-specific test harness into a general-purpose Android security testing environment. Starting with security hardening and configuration cleanup, then generalizing the codebase, adding proxy integration, APK analysis tooling, and finally extending Frida scripts for comprehensive bypass capabilities.
+- ✅ **[v1.0 Android Test Harness](milestones/v1.0-ROADMAP.md)** — Phases 1-6 (shipped 2026-01-19)
 
-## Domain Expertise
+## Completed Milestones
 
-None
+<details>
+<summary>✅ v1.0 Android Test Harness (Phases 1-6) — SHIPPED 2026-01-19</summary>
 
-## Phases
+**Overview:** Transform the SleepIQ-specific test harness into a general-purpose Android security testing environment.
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+- [x] Phase 1: Configuration & Security (2/2 plans) — completed 2026-01-19
+- [x] Phase 2: Generalization (2/2 plans) — completed 2026-01-19
+- [x] Phase 3: Proxy Integration (2/2 plans) — completed 2026-01-19
+- [x] Phase 4: APK Analysis Tooling (2/2 plans) — completed 2026-01-19
+- [x] Phase 5: Code Browsing Workflow (1/1 plan) — completed 2026-01-19
+- [x] Phase 6: Security Bypasses (2/2 plans) — completed 2026-01-19
 
-Decimal phases appear between their surrounding integers in numeric order.
+**Total:** 6 phases, 11 plans
 
-- [x] **Phase 1: Configuration & Security** - Replace hardcoded credentials with env vars, secure temp file handling
-- [x] **Phase 2: Generalization** - Remove SleepIQ-specific code, make harness app-agnostic
-- [x] **Phase 3: Proxy Integration** - Configure emulator traffic routing through Burp Suite CE
-- [x] **Phase 4: APK Analysis Tooling** - Integrate jadx and apktool for decompilation
-- [x] **Phase 5: Code Browsing Workflow** - Add workflow for examining decompiled code
-- [x] **Phase 6: Security Bypasses** - Extend Frida scripts for root/emulator detection bypass
+See [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full details.
 
-## Phase Details
-
-### Phase 1: Configuration & Security
-**Goal**: Eliminate hardcoded credentials and insecure temp file storage; establish proper configuration management
-**Depends on**: Nothing (first phase)
-**Research**: Unlikely (internal refactoring, established patterns)
-**Plans**: TBD
-
-Plans:
-- [x] 01-01: Environment variable configuration system
-- [x] 01-02: Secure credential handling and temp file cleanup
-
-### Phase 2: Generalization
-**Goal**: Remove all SleepIQ-specific code and make the harness work with any Android app
-**Depends on**: Phase 1
-**Research**: Unlikely (internal code cleanup)
-**Plans**: 2
-
-Plans:
-- [x] 02-01: Generalize Python harness (rename class, configurable package, optional auth)
-- [x] 02-02: Generalize shell scripts and documentation
-
-### Phase 3: Proxy Integration
-**Goal**: Configure Android emulator to route all traffic through Burp Suite CE for interception
-**Depends on**: Phase 2
-**Research**: Likely (Android emulator proxy configuration)
-**Research topics**: Android emulator proxy settings, ADB proxy commands, Burp CA certificate installation on emulator
-**Plans**: TBD
-
-Plans:
-- [x] 03-01: Emulator proxy configuration and CA certificate setup
-- [x] 03-02: Documentation and verification
-
-### Phase 4: APK Analysis Tooling
-**Goal**: Integrate jadx and apktool for APK decompilation and analysis
-**Depends on**: Phase 1 (uses config system)
-**Research**: Likely (external tool integration)
-**Research topics**: jadx CLI usage and output format, apktool CLI usage, integration patterns
-**Plans**: TBD
-
-Plans:
-- [x] 04-01: jadx integration for Java source decompilation
-- [x] 04-02: apktool integration for resource extraction
-
-### Phase 5: Code Browsing Workflow
-**Goal**: Create workflow for navigating and examining decompiled APK code
-**Depends on**: Phase 4
-**Research**: Unlikely (internal workflow using Phase 4 tools)
-**Plans**: TBD
-
-Plans:
-- [x] 05-01: Code browsing scripts and output organization
-
-### Phase 6: Security Bypasses
-**Goal**: Extend Frida scripts to bypass root detection and emulator detection
-**Depends on**: Phase 2 (harness must be generalized first)
-**Research**: Likely (Frida scripting patterns)
-**Research topics**: Root detection bypass techniques, emulator detection bypass, common detection methods to hook
-**Plans**: TBD
-
-Plans:
-- [x] 06-01: Root detection bypass Frida script
-- [x] 06-02: Emulator detection bypass Frida script
+</details>
 
 ## Progress
 
-**Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
+| Milestone | Phases | Plans | Status | Completed |
+|-----------|--------|-------|--------|-----------|
+| v1.0 Android Test Harness | 1-6 | 11/11 | Complete | 2026-01-19 |
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Configuration & Security | 2/2 | Complete | 2026-01-19 |
-| 2. Generalization | 2/2 | Complete | 2026-01-19 |
-| 3. Proxy Integration | 2/2 | Complete | 2026-01-19 |
-| 4. APK Analysis Tooling | 2/2 | Complete | 2026-01-19 |
-| 5. Code Browsing Workflow | 1/1 | Complete | 2026-01-19 |
-| 6. Security Bypasses | 2/2 | Complete | 2026-01-19 |
+---
+
+_For milestone details, see `.planning/milestones/`_
+_For project history, see `.planning/MILESTONES.md`_

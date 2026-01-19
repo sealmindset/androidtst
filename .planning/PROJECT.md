@@ -12,27 +12,30 @@ Automated setup that takes a macOS with prerequisites and stands up a complete, 
 
 ### Validated
 
-Existing functionality from androidtst repository:
-
+**v1.0 (2026-01-19):**
 - ✓ Configure and launch Android emulator with Pixel 6 profile and Play Store — `setup.sh`, `start-emulator.sh`
 - ✓ Pull APKs from the emulated device — `extract-apk.sh`
 - ✓ Frida SSL pinning bypass scripts — `frida_ssl_bypass.js`
 - ✓ Python test harness with ADB wrapper and UI automation — `test_harness.py`
 - ✓ Playwright + Burp proxy integration for API testing — `playwright-burp-harness/`
 - ✓ Interactive shell testing interface — `run-tests.sh`
+- ✓ Generalize harness (remove SleepIQ-specific code, make app-agnostic) — v1.0
+- ✓ Add APK decompilation tooling (jadx, apktool integration) — v1.0
+- ✓ Add code browsing/examination workflow — v1.0
+- ✓ Configure emulator proxy routing to Burp Suite CE — v1.0
+- ✓ Add root detection bypass (extend Frida scripts) — v1.0
+- ✓ Add emulator detection bypass (extend Frida scripts) — v1.0
+- ✓ Configuration management (replace hardcoded credentials with env vars) — v1.0
+- ✓ Secure credential handling (remove /tmp storage, add cleanup) — v1.0
 
 ### Active
 
-New functionality to build:
+(None - v1.0 complete)
 
-- [ ] Generalize harness (remove SleepIQ-specific code, make app-agnostic)
-- [ ] Add APK decompilation tooling (jadx, apktool integration)
-- [ ] Add code browsing/examination workflow
-- [ ] Configure emulator proxy routing to Burp Suite CE
-- [ ] Add root detection bypass (extend Frida scripts)
-- [ ] Add emulator detection bypass (extend Frida scripts)
-- [ ] Configuration management (replace hardcoded credentials with env vars)
-- [ ] Secure credential handling (remove /tmp storage, add cleanup)
+Future enhancements:
+- [ ] GUI/dashboard for visual test management
+- [ ] Additional CLI security tools (semgrep integration)
+- [ ] iOS support
 
 ### Out of Scope
 
@@ -74,8 +77,11 @@ New functionality to build:
 | Burp Suite CE as prerequisite | User's existing tool of choice, avoid bundling commercial-adjacent software | — Pending |
 | Playwright-style automation | Scriptable, familiar pattern, good for future GUI integration | ✓ Good (existing) |
 | Frida for bypasses | Industry standard for mobile security testing, handles pinning/detection | ✓ Good (existing) |
-| Clone and enhance androidtst | Existing infrastructure saves effort; generalize rather than rebuild | — Pending |
-| Remove hardcoded credentials | Critical security issue in existing code | — Pending |
+| Clone and enhance androidtst | Existing infrastructure saves effort; generalize rather than rebuild | ✓ Good |
+| Remove hardcoded credentials | Critical security issue in existing code | ✓ Good |
+| python-dotenv for config | Industry standard, simple .env file loading | ✓ Good |
+| Dual decompilation (jadx + apktool) | jadx for Java source, apktool for manifest/resources | ✓ Good |
+| Frida for all bypasses | Industry standard, comprehensive hook support | ✓ Good |
 
 ---
-*Last updated: 2026-01-19 after codebase mapping*
+*Last updated: 2026-01-19 after v1.0 milestone*
