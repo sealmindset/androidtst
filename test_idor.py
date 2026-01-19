@@ -11,9 +11,56 @@ import subprocess
 import json
 import time
 import re
+import os
+import tempfile
+import atexit
 from pathlib import Path
 
 from config import config
+
+
+# Secure temp file management
+_temp_files = []
+_jwt_token_path = None
+_cookies_path = None
+
+
+def get_secure_temp_file(suffix: str) -> str:
+    """Create a secure temp file with restricted permissions (0o600)."""
+    fd, path = tempfile.mkstemp(suffix=suffix, prefix="android_test_")
+    os.close(fd)
+    os.chmod(path, 0o600)  # Owner read/write only
+    _temp_files.append(path)
+    return path
+
+
+def cleanup_temp_files():
+    """Clean up all temp files created during testing."""
+    for path in _temp_files:
+        try:
+            if os.path.exists(path):
+                os.remove(path)
+        except OSError:
+            pass
+
+
+atexit.register(cleanup_temp_files)
+
+
+def get_jwt_token_path() -> str:
+    """Get or create the secure JWT token file path."""
+    global _jwt_token_path
+    if _jwt_token_path is None:
+        _jwt_token_path = get_secure_temp_file("_jwt.txt")
+    return _jwt_token_path
+
+
+def get_cookies_path() -> str:
+    """Get or create the secure cookies file path."""
+    global _cookies_path
+    if _cookies_path is None:
+        _cookies_path = get_secure_temp_file("_cookies.txt")
+    return _cookies_path
 
 
 def run_adb(command: str) -> str:
@@ -77,16 +124,17 @@ def extract_jwt_from_logcat() -> str:
         proc.terminate()
 
     if jwt_token:
-        # Save token
-        Path("/tmp/jwt_token.txt").write_text(jwt_token)
-        print("✓ Saved to /tmp/jwt_token.txt")
+        # Save token to secure temp file
+        jwt_path = get_jwt_token_path()
+        Path(jwt_path).write_text(jwt_token)
+        print(f"✓ Saved to secure temp file (auto-cleaned on exit)")
         return jwt_token
     else:
         print("⚠️  No JWT token found in logs")
         print("")
         print("Try these alternatives:")
         print("1. Use Android Studio Profiler (see START_NOW.md)")
-        print("2. Check if token is in /tmp/jwt_token.txt from previous capture")
+        print("2. Re-run this script while navigating in the app")
         return None
 
 
@@ -94,11 +142,12 @@ def authenticate() -> dict:
     """Authenticate and get session cookie"""
     print("\n[2/5] Authenticating to get session cookie...")
 
+    cookies_path = get_cookies_path()
     cmd = f"""curl -s -X PUT "{config.api_base}/login" \\
         -H "Content-Type: application/json" \\
         -H "X-App-Version: 5.3.30" \\
         -d '{{"login":"{config.test_email}","password":"{config.test_password}"}}' \\
-        -c /tmp/test_cookies.txt"""
+        -c {cookies_path}"""
 
     response = run_cmd(cmd)
 
@@ -107,7 +156,7 @@ def authenticate() -> dict:
         print(f"✓ Authenticated: {json.dumps(data, indent=2)[:100]}...")
 
         # Extract JSESSIONID
-        jsessionid = run_cmd("grep JSESSIONID /tmp/test_cookies.txt | awk '{print $7}'")
+        jsessionid = run_cmd(f"grep JSESSIONID {cookies_path} | awk '{{print $7}}'")
         return {
             "jsessionid": jsessionid,
             "user_id": data.get("userId", "")
@@ -281,18 +330,18 @@ def main():
     # Try to extract JWT token
     jwt_token = extract_jwt_from_logcat()
 
-    # If extraction failed, check if token already exists
+    # If extraction failed, check if token was saved this session
     if not jwt_token:
-        jwt_path = Path("/tmp/jwt_token.txt")
-        if jwt_path.exists():
+        jwt_path = Path(get_jwt_token_path())
+        if jwt_path.exists() and jwt_path.stat().st_size > 0:
             jwt_token = jwt_path.read_text().strip()
-            print(f"\n✓ Using existing JWT token from /tmp/jwt_token.txt")
+            print(f"\n✓ Using JWT token from current session")
             print(f"  Token: {jwt_token[:50]}...")
         else:
             print("\n❌ No JWT token available")
             print("   Please capture JWT token first:")
             print("   1. See START_NOW.md for Android Studio method")
-            print("   2. Or run this script while navigating in SleepIQ app")
+            print("   2. Or run this script while navigating in the app")
             return
 
     # Authenticate
