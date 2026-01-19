@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-SleepIQ Android Test Harness
+Android Test Harness
 
 A Python-based test harness for automating Android app testing.
 Uses ADB for device interaction and UI Automator for element identification.
 
 Usage:
-    python test_harness.py
+    TARGET_PACKAGE=com.example.myapp python3 test_harness.py
 
 Or import as a module:
-    from test_harness import SleepIQTestHarness
-    harness = SleepIQTestHarness()
+    from test_harness import AndroidTestHarness
+    harness = AndroidTestHarness("com.example.myapp")
     harness.launch_app()
 """
 
@@ -272,12 +272,11 @@ class UIAutomator:
         return False
 
 
-class SleepIQTestHarness:
-    """Test harness specifically for the SleepIQ app."""
+class AndroidTestHarness:
+    """Test harness for Android app automation."""
 
-    PACKAGE_NAME = "com.selectcomfort.SleepIQ"
-
-    def __init__(self, device_id: Optional[str] = None):
+    def __init__(self, package_name: str, device_id: Optional[str] = None):
+        self.package_name = package_name
         self.adb = ADBWrapper(device_id)
         self.ui = UIAutomator(self.adb)
         self.screenshots_dir = Path(__file__).parent / "screenshots"
@@ -288,24 +287,24 @@ class SleepIQTestHarness:
         return self.adb.is_device_connected()
 
     def is_app_installed(self) -> bool:
-        """Check if SleepIQ app is installed."""
-        return self.adb.is_package_installed(self.PACKAGE_NAME)
+        """Check if target app is installed."""
+        return self.adb.is_package_installed(self.package_name)
 
     def launch_app(self):
-        """Launch the SleepIQ app."""
-        print(f"Launching {self.PACKAGE_NAME}...")
-        self.adb.force_stop(self.PACKAGE_NAME)
+        """Launch the target app."""
+        print(f"Launching {self.package_name}...")
+        self.adb.force_stop(self.package_name)
         time.sleep(0.5)
-        self.adb.launch_app(self.PACKAGE_NAME)
+        self.adb.launch_app(self.package_name)
         time.sleep(3)  # Wait for app to load
 
     def stop_app(self):
-        """Stop the SleepIQ app."""
-        self.adb.force_stop(self.PACKAGE_NAME)
+        """Stop the target app."""
+        self.adb.force_stop(self.package_name)
 
     def clear_app_data(self):
         """Clear all app data (will require re-login)."""
-        self.adb.clear_app_data(self.PACKAGE_NAME)
+        self.adb.clear_app_data(self.package_name)
 
     def screenshot(self, name: str = "screenshot") -> str:
         """Take a screenshot and return the path."""
@@ -363,7 +362,7 @@ class SleepIQTestHarness:
         time.sleep(2)
 
         # Look for login-related elements
-        # Adjust these based on actual SleepIQ app UI
+        # Adjust these based on actual app UI
         login_indicators = ["Login", "Sign In", "Email", "Password", "Username"]
 
         for indicator in login_indicators:
@@ -379,7 +378,7 @@ class SleepIQTestHarness:
     def run_all_tests(self):
         """Run all test scenarios."""
         print("\n" + "=" * 50)
-        print("SleepIQ Test Harness - Running All Tests")
+        print("Android Test Harness - Running All Tests")
         print("=" * 50)
 
         if not self.check_device():
@@ -387,7 +386,7 @@ class SleepIQTestHarness:
             return
 
         if not self.is_app_installed():
-            print("ERROR: SleepIQ app not installed!")
+            print(f"ERROR: App not installed: {self.package_name}")
             return
 
         results = []
@@ -404,7 +403,17 @@ class SleepIQTestHarness:
 
 def main():
     """Main entry point."""
-    harness = SleepIQTestHarness()
+    # Get package name from environment or prompt user
+    package_name = os.environ.get('TARGET_PACKAGE')
+    if not package_name:
+        print("TARGET_PACKAGE environment variable not set.")
+        package_name = input("Enter target app package name: ").strip()
+        if not package_name:
+            print("ERROR: Package name is required.")
+            print("Usage: TARGET_PACKAGE=com.example.app python3 test_harness.py")
+            return
+
+    harness = AndroidTestHarness(package_name)
 
     if not harness.check_device():
         print("No device connected. Start the emulator first:")
@@ -412,13 +421,14 @@ def main():
         return
 
     if not harness.is_app_installed():
-        print("SleepIQ app not installed. Install it first:")
-        print("  ./install-sleepiq.sh")
+        print(f"App not installed: {package_name}")
+        print("Install the app first:")
+        print(f"  TARGET_PACKAGE={package_name} ./install-app.sh")
         return
 
     # Interactive menu
     while True:
-        print("\n=== SleepIQ Test Harness ===")
+        print(f"\n=== Android Test Harness ({package_name}) ===")
         print("1. Launch app")
         print("2. Take screenshot")
         print("3. Dump UI hierarchy")
