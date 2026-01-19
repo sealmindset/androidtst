@@ -96,6 +96,8 @@ TARGET_PACKAGE=com.example.myapp python3 test_harness.py
 | `configure-proxy.sh` | Configure emulator proxy settings |
 | `install-burp-cert.sh` | Install Burp CA certificate on emulator |
 | `start-emulator-proxy.sh` | Start emulator with proxy pre-configured |
+| `extract-apk.sh` | Extract APK from installed app |
+| `decompile-apk.sh` | Decompile APK to Java source using jadx |
 
 ## Proxy Integration
 
@@ -150,6 +152,49 @@ adb shell settings get global http_proxy
 **Connection refused:**
 - Burp may not be running
 - Check Burp's proxy listener is bound to all interfaces or localhost
+
+## APK Analysis
+
+Decompile APKs to examine source code and resources.
+
+### Prerequisites
+
+Install decompilation tools:
+```bash
+brew install jadx    # Java source decompilation
+brew install apktool # Resource extraction (optional)
+```
+
+### Decompiling APKs
+
+```bash
+# 1. Extract APK from device
+./extract-apk.sh com.example.app
+
+# 2. Decompile to Java source
+./decompile-apk.sh apks/app_v1.2.3.apk
+# or auto-select most recent APK:
+./decompile-apk.sh
+
+# Output structure:
+# decompiled/<app>/jadx/sources/  - Java source code
+# decompiled/<app>/jadx/resources/ - App resources
+```
+
+### Examining Code
+
+```bash
+# Open in VS Code
+code decompiled/<app>/jadx/sources
+
+# Search for interesting patterns
+grep -r "api.example.com" decompiled/<app>/jadx/sources/
+grep -r "password" decompiled/<app>/jadx/sources/
+grep -r "secret" decompiled/<app>/jadx/sources/
+
+# Find network-related code
+grep -rl "HttpURLConnection\|OkHttp\|Retrofit" decompiled/<app>/jadx/sources/
+```
 
 ## Configuration
 
