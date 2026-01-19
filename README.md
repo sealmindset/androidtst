@@ -93,6 +93,63 @@ TARGET_PACKAGE=com.example.myapp python3 test_harness.py
 | `install-app.sh` | Install app from Play Store (takes package name as argument) |
 | `run-tests.sh` | Interactive shell-based test harness |
 | `test_harness.py` | Python test automation framework |
+| `configure-proxy.sh` | Configure emulator proxy settings |
+| `install-burp-cert.sh` | Install Burp CA certificate on emulator |
+| `start-emulator-proxy.sh` | Start emulator with proxy pre-configured |
+
+## Proxy Integration
+
+Route emulator traffic through Burp Suite CE for security testing.
+
+### Prerequisites
+
+1. **Burp Suite CE** running on localhost:8080
+2. **Burp CA certificate** exported (see below)
+
+### Quick Start
+
+```bash
+# 1. Export Burp CA certificate (one-time setup)
+#    Burp > Proxy > Options > Import/Export CA > Export as DER
+#    Save as: ~/burp-ca.der
+
+# 2. Install certificate on emulator
+./install-burp-cert.sh
+
+# 3. Start emulator with proxy
+./start-emulator-proxy.sh
+```
+
+### Manual Proxy Control
+
+```bash
+# Enable proxy (default: Burp on host)
+./configure-proxy.sh
+
+# Enable proxy with custom address
+./configure-proxy.sh 10.0.2.2:8081
+
+# Disable proxy
+./configure-proxy.sh --disable
+
+# Check current proxy setting
+adb shell settings get global http_proxy
+```
+
+### Troubleshooting Proxy
+
+**No traffic in Burp:**
+- Verify Burp is listening: Proxy > Options > Proxy Listeners
+- Check proxy is set: `adb shell settings get global http_proxy`
+- Ensure emulator can reach host: `adb shell ping -c 1 10.0.2.2`
+
+**HTTPS traffic not visible:**
+- Install Burp CA certificate: `./install-burp-cert.sh`
+- Some apps use certificate pinning (see Security Bypasses section)
+
+**Connection refused:**
+- Burp may not be running
+- Check Burp's proxy listener is bound to all interfaces or localhost
 
 ## Configuration
 
