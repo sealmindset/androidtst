@@ -1,18 +1,32 @@
 #!/bin/bash
-# SleepIQ Test Harness - Basic UI Automation
+# Android Test Harness - Basic UI Automation
+#
+# Usage: TARGET_PACKAGE=com.example.app ./run-tests.sh
 
 set -e
 
 ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
 export PATH="$ANDROID_SDK_ROOT/platform-tools:$PATH"
 
-PACKAGE_NAME="com.selectcomfort.SleepIQ"
+# Get package name from environment variable
+PACKAGE_NAME="${TARGET_PACKAGE:-}"
+if [ -z "$PACKAGE_NAME" ]; then
+    echo "ERROR: TARGET_PACKAGE environment variable not set"
+    echo ""
+    echo "Usage: TARGET_PACKAGE=com.example.app ./run-tests.sh"
+    echo ""
+    echo "Or set in .env file:"
+    echo "  TARGET_PACKAGE=com.example.app"
+    exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCREENSHOTS_DIR="$SCRIPT_DIR/screenshots"
 
 mkdir -p "$SCREENSHOTS_DIR"
 
-echo "=== SleepIQ Test Harness ==="
+echo "=== Android Test Harness ==="
+echo "Package: $PACKAGE_NAME"
 echo ""
 
 # Check if emulator is running
@@ -23,7 +37,7 @@ fi
 
 # Check if app is installed
 if ! adb shell pm list packages | grep -q "$PACKAGE_NAME"; then
-    echo "ERROR: SleepIQ app not installed. Install it first with: ./install-sleepiq.sh"
+    echo "ERROR: Target app not installed. Install it first with: ./install-app.sh $PACKAGE_NAME"
     exit 1
 fi
 
@@ -84,7 +98,7 @@ scroll_up() {
     sleep 1
 }
 
-echo "Starting SleepIQ app..."
+echo "Starting target app..."
 adb shell am force-stop "$PACKAGE_NAME"
 sleep 1
 
