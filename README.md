@@ -98,6 +98,7 @@ TARGET_PACKAGE=com.example.myapp python3 test_harness.py
 | `start-emulator-proxy.sh` | Start emulator with proxy pre-configured |
 | `extract-apk.sh` | Extract APK from installed app |
 | `decompile-apk.sh` | Decompile APK to Java source using jadx |
+| `decode-apk.sh` | Decode APK resources and manifest using apktool |
 
 ## Proxy Integration
 
@@ -176,9 +177,17 @@ brew install apktool # Resource extraction (optional)
 # or auto-select most recent APK:
 ./decompile-apk.sh
 
+# 3. Decode resources and manifest (optional)
+./decode-apk.sh apks/app_v1.2.3.apk
+# or auto-select most recent:
+./decode-apk.sh
+
 # Output structure:
-# decompiled/<app>/jadx/sources/  - Java source code
-# decompiled/<app>/jadx/resources/ - App resources
+# decompiled/<app>/jadx/sources/      - Java source code
+# decompiled/<app>/jadx/resources/    - App resources
+# decompiled/<app>/apktool/AndroidManifest.xml - App manifest
+# decompiled/<app>/apktool/res/       - Resources
+# decompiled/<app>/apktool/smali/     - Smali bytecode
 ```
 
 ### Examining Code
@@ -194,6 +203,28 @@ grep -r "secret" decompiled/<app>/jadx/sources/
 
 # Find network-related code
 grep -rl "HttpURLConnection\|OkHttp\|Retrofit" decompiled/<app>/jadx/sources/
+```
+
+### Security Analysis Tips
+
+**Check permissions:**
+```bash
+grep 'uses-permission' decompiled/<app>/apktool/AndroidManifest.xml
+```
+
+**Find exported components (attack surface):**
+```bash
+grep -B2 'exported="true"' decompiled/<app>/apktool/AndroidManifest.xml
+```
+
+**Check for cleartext traffic:**
+```bash
+grep -i 'cleartextTrafficPermitted' decompiled/<app>/apktool/res/xml/*.xml
+```
+
+**Search for hardcoded secrets:**
+```bash
+grep -rE '(api_key|apikey|secret|password|token).*=' decompiled/<app>/jadx/sources/
 ```
 
 ## Configuration
