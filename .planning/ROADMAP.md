@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Configuration & Security** - Replace hardcoded credentials with env vars, secure temp file handling
 - [x] **Phase 2: Generalization** - Remove SleepIQ-specific code, make harness app-agnostic
-- [ ] **Phase 3: Proxy Integration** - Configure emulator traffic routing through Burp Suite CE
+- [x] **Phase 3: Proxy Integration** - Configure emulator traffic routing through Burp Suite CE
 - [ ] **Phase 4: APK Analysis Tooling** - Integrate jadx and apktool for decompilation
 - [ ] **Phase 5: Code Browsing Workflow** - Add workflow for examining decompiled code
 - [ ] **Phase 6: Security Bypasses** - Extend Frida scripts for root/emulator detection bypass
@@ -53,8 +53,8 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 03-01: Emulator proxy configuration and CA certificate setup
-- [ ] 03-02: Verify traffic capture and test with sample app
+- [x] 03-01: Emulator proxy configuration and CA certificate setup
+- [x] 03-02: Documentation and verification
 
 ### Phase 4: APK Analysis Tooling
 **Goal**: Integrate jadx and apktool for APK decompilation and analysis
@@ -96,7 +96,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Configuration & Security | 2/2 | Complete | 2026-01-19 |
 | 2. Generalization | 2/2 | Complete | 2026-01-19 |
-| 3. Proxy Integration | 0/2 | Not started | - |
+| 3. Proxy Integration | 2/2 | Complete | 2026-01-19 |
 | 4. APK Analysis Tooling | 0/2 | Not started | - |
 | 5. Code Browsing Workflow | 0/1 | Not started | - |
 | 6. Security Bypasses | 0/2 | Not started | - |
