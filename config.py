@@ -3,18 +3,26 @@
 Android Test Harness Configuration Module
 
 Loads configuration from environment variables (via .env file).
-All sensitive credentials must be provided via environment - no hardcoded defaults.
+Credentials are optional - only required for scripts that need authentication.
 
 Usage:
     from config import config
 
+    # Always available
+    package = config.target_package  # Required
+
+    # Optional - may be None
     email = config.test_email
-    password = config.test_password
+    api = config.api_base
+
+    # For scripts requiring auth
+    config.require_auth()  # Raises if auth vars missing
 """
 
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 # Load .env file if it exists
 try:
@@ -36,42 +44,73 @@ class Config:
     """Configuration for Android Test Harness.
 
     Required environment variables:
-        TEST_EMAIL: Email address for test account
-        TEST_PASSWORD: Password for test account
-        SLEEPER_ID: Sleeper ID for IDOR testing
+        TARGET_PACKAGE: Android package name to test (e.g., com.example.app)
 
     Optional environment variables:
-        API_BASE: Base URL for API (default: https://api.sleepiq.sleepnumber.com/rest)
+        TEST_EMAIL: Email address for test account (if app requires auth)
+        TEST_PASSWORD: Password for test account (if app requires auth)
+        TARGET_ID: Target identifier for testing (e.g., user ID, resource ID)
+        API_BASE: Base URL for API testing
     """
-    test_email: str
-    test_password: str
-    sleeper_id: str
-    api_base: str
+    target_package: Optional[str]
+    test_email: Optional[str]
+    test_password: Optional[str]
+    target_id: Optional[str]
+    api_base: Optional[str]
 
     @classmethod
     def from_environment(cls) -> 'Config':
         """Load configuration from environment variables.
 
+        Does not raise on missing optional variables.
+        Use require_auth() to validate auth-related vars when needed.
+        """
+        return cls(
+            target_package=os.environ.get('TARGET_PACKAGE'),
+            test_email=os.environ.get('TEST_EMAIL'),
+            test_password=os.environ.get('TEST_PASSWORD'),
+            target_id=os.environ.get('TARGET_ID'),
+            api_base=os.environ.get('API_BASE')
+        )
+
+    def require_package(self) -> str:
+        """Validate and return TARGET_PACKAGE (required for most operations).
+
         Raises:
-            ConfigurationError: If required environment variables are missing.
+            ConfigurationError: If TARGET_PACKAGE is not set.
+        """
+        if not self.target_package:
+            raise ConfigurationError(
+                "Missing required environment variable: TARGET_PACKAGE\n"
+                "\n"
+                "To configure:\n"
+                "  export TARGET_PACKAGE=com.example.app\n"
+                "\n"
+                "Or add to .env file:\n"
+                "  TARGET_PACKAGE=com.example.app"
+            )
+        return self.target_package
+
+    def require_auth(self) -> tuple:
+        """Validate auth variables are set.
+
+        Raises:
+            ConfigurationError: If TEST_EMAIL or TEST_PASSWORD is missing.
+
+        Returns:
+            Tuple of (test_email, test_password)
         """
         missing = []
 
-        test_email = os.environ.get('TEST_EMAIL')
-        if not test_email:
+        if not self.test_email:
             missing.append('TEST_EMAIL')
 
-        test_password = os.environ.get('TEST_PASSWORD')
-        if not test_password:
+        if not self.test_password:
             missing.append('TEST_PASSWORD')
-
-        sleeper_id = os.environ.get('SLEEPER_ID')
-        if not sleeper_id:
-            missing.append('SLEEPER_ID')
 
         if missing:
             raise ConfigurationError(
-                f"Missing required environment variables: {', '.join(missing)}\n"
+                f"Missing required auth variables: {', '.join(missing)}\n"
                 f"\n"
                 f"To configure:\n"
                 f"  1. Copy .env.example to .env\n"
@@ -80,20 +119,12 @@ class Config:
                 f"\n"
                 f"Or set environment variables directly:\n"
                 f"  export TEST_EMAIL=your-email@example.com\n"
-                f"  export TEST_PASSWORD=your-password\n"
-                f"  export SLEEPER_ID=your-sleeper-id"
+                f"  export TEST_PASSWORD=your-password"
             )
 
-        api_base = os.environ.get('API_BASE', 'https://api.sleepiq.sleepnumber.com/rest')
-
-        return cls(
-            test_email=test_email,
-            test_password=test_password,
-            sleeper_id=sleeper_id,
-            api_base=api_base
-        )
+        return (self.test_email, self.test_password)
 
 
 # Global config instance - loaded on import
-# This will raise ConfigurationError if required vars are missing
+# Does NOT raise if optional vars are missing
 config = Config.from_environment()
