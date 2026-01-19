@@ -1,10 +1,12 @@
 #!/bin/bash
 # Connect to a physical Android device for Bluetooth testing
+#
+# Usage: TARGET_PACKAGE=com.example.app ./connect-device.sh
 
 ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
 export PATH="$ANDROID_SDK_ROOT/platform-tools:$PATH"
 
-PACKAGE_NAME="com.selectcomfort.SleepIQ"
+PACKAGE_NAME="${TARGET_PACKAGE:-}"
 
 echo "=== Physical Device Connection ==="
 echo ""
@@ -65,18 +67,23 @@ else
 fi
 echo ""
 
-# Check if SleepIQ is installed
-if adb -s "$DEVICE_ID" shell pm list packages | grep -q "$PACKAGE_NAME"; then
-    echo "SleepIQ app: INSTALLED"
+# Check if target app is installed (if TARGET_PACKAGE is set)
+if [ -n "$PACKAGE_NAME" ]; then
+    if adb -s "$DEVICE_ID" shell pm list packages | grep -q "$PACKAGE_NAME"; then
+        echo "Target app ($PACKAGE_NAME): INSTALLED"
 
-    # Get app version
-    VERSION=$(adb -s "$DEVICE_ID" shell dumpsys package "$PACKAGE_NAME" | grep versionName | head -1 | cut -d'=' -f2)
-    echo "  Version: $VERSION"
+        # Get app version
+        VERSION=$(adb -s "$DEVICE_ID" shell dumpsys package "$PACKAGE_NAME" | grep versionName | head -1 | cut -d'=' -f2)
+        echo "  Version: $VERSION"
+    else
+        echo "Target app ($PACKAGE_NAME): NOT INSTALLED"
+        echo ""
+        echo "Install from Play Store or use:"
+        echo "  adb install path/to/app.apk"
+    fi
 else
-    echo "SleepIQ app: NOT INSTALLED"
-    echo ""
-    echo "Install from Play Store or use:"
-    echo "  adb install path/to/sleepiq.apk"
+    echo "No TARGET_PACKAGE set. Skipping app check."
+    echo "Set TARGET_PACKAGE to check app installation status."
 fi
 
 echo ""

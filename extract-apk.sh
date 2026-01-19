@@ -4,7 +4,13 @@
 ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
 export PATH="$ANDROID_SDK_ROOT/platform-tools:$PATH"
 
-PACKAGE_NAME="${1:-com.selectcomfort.SleepIQ}"
+PACKAGE_NAME="${1:-$TARGET_PACKAGE}"
+
+if [ -z "$PACKAGE_NAME" ]; then
+    echo "Usage: ./extract-apk.sh <package-name>"
+    echo "   or: TARGET_PACKAGE=com.example.app ./extract-apk.sh"
+    exit 1
+fi
 OUTPUT_DIR="$(dirname "$0")/apks"
 
 mkdir -p "$OUTPUT_DIR"

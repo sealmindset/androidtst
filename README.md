@@ -1,6 +1,14 @@
 # Android Test Harness
 
-A test harness for running and testing the Android app in an emulated environment.
+A general-purpose test harness for running and testing Android apps in an emulated environment. Configure it once and use it to test any Android application.
+
+## Overview
+
+This harness provides:
+- **Automated emulator setup** - One-command SDK and AVD installation
+- **App installation** - Install any app from Play Store or APK
+- **UI automation** - Python and shell-based test frameworks
+- **Security testing** - Templates for IDOR and other vulnerability tests
 
 ## Prerequisites
 
@@ -13,7 +21,6 @@ A test harness for running and testing the Android app in an emulated environmen
 ### 1. Run Setup
 
 ```bash
-cd android-test-harness
 ./setup.sh
 ```
 
@@ -29,7 +36,21 @@ This will:
 source ~/.zshrc
 ```
 
-### 3. Start the Emulator
+### 3. Configure Target App
+
+Create a `.env` file with your target app:
+
+```bash
+cp .env.example .env
+# Edit .env with your target package name
+```
+
+Example `.env`:
+```
+TARGET_PACKAGE=com.example.myapp
+```
+
+### 4. Start the Emulator
 
 ```bash
 ./start-emulator.sh
@@ -37,26 +58,30 @@ source ~/.zshrc
 
 Wait for the emulator to fully boot (you'll see "Emulator Ready").
 
-### 4. InstallApp
+### 5. Install Your App
 
 ```bash
-./install-sleepiq.sh
+# Using argument:
+./install-app.sh com.example.myapp
+
+# Or using environment variable:
+TARGET_PACKAGE=com.example.myapp ./install-app.sh
 ```
 
 This opens the Google Play Store on the emulator. You'll need to:
 1. Sign in to your Google Account (first time only)
-2. Click "Install" on theapp page
+2. Click "Install" on the app page
 
-### 5. Run Tests
+### 6. Run Tests
 
 **Shell-based (interactive):**
 ```bash
-./run-tests.sh
+TARGET_PACKAGE=com.example.myapp ./run-tests.sh
 ```
 
 **Python-based (programmatic):**
 ```bash
-python3 test_harness.py
+TARGET_PACKAGE=com.example.myapp python3 test_harness.py
 ```
 
 ## Scripts Overview
@@ -65,18 +90,43 @@ python3 test_harness.py
 |--------|---------|
 | `setup.sh` | One-time setup of Android SDK and emulator |
 | `start-emulator.sh` | Start the Android emulator |
-| `install-sleepiq.sh` | Open Play Store to install|
+| `install-app.sh` | Install app from Play Store (takes package name as argument) |
 | `run-tests.sh` | Interactive shell-based test harness |
 | `test_harness.py` | Python test automation framework |
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `TARGET_PACKAGE` | Yes | Android package name (e.g., `com.example.app`) |
+| `TEST_EMAIL` | No | Test account email (for auth-required apps) |
+| `TEST_PASSWORD` | No | Test account password |
+| `TARGET_ID` | No | Target identifier for security tests |
+| `API_BASE` | No | API base URL for backend testing |
+
+### .env File
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+TARGET_PACKAGE=com.example.myapp
+# TEST_EMAIL=test@example.com
+# TEST_PASSWORD=secret
+# TARGET_ID=12345
+# API_BASE=https://api.example.com/v1
+```
 
 ## Using the Python Test Harness
 
 The Python harness provides a programmatic API for test automation:
 
 ```python
-from test_harness import SleepIQTestHarness
+from test_harness import AndroidTestHarness
 
-harness = SleepIQTestHarness()
+# Create harness for your target app
+harness = AndroidTestHarness("com.example.myapp")
 
 # Launch the app
 harness.launch_app()
@@ -86,7 +136,7 @@ harness.screenshot("login_screen")
 
 # Find and click UI elements
 harness.ui.click_text("Sign In")
-harness.ui.click_id("com.selectcomfort.SleepIQ:id/login_button")
+harness.ui.click_id("com.example.myapp:id/login_button")
 
 # Input text
 harness.adb.input_text("user@example.com")
@@ -97,6 +147,17 @@ harness.ui.wait_for_text("Welcome", timeout=10)
 # Run all tests
 harness.run_all_tests()
 ```
+
+## Security Testing
+
+The `example_idor_test.py` file provides a template for IDOR vulnerability testing. Copy and customize it for your target app:
+
+```bash
+cp example_idor_test.py test_myapp_idor.py
+# Edit test_myapp_idor.py with your API endpoints
+```
+
+See the CUSTOMIZE markers in the template for guidance on what to change.
 
 ## Manual ADB Commands
 
@@ -130,20 +191,20 @@ adb shell input keyevent KEYCODE_BACK
 adb shell input keyevent KEYCODE_HOME
 adb shell input keyevent KEYCODE_ENTER
 
-# Launch app
-adb shell monkey -p com.selectcomfort.SleepIQ 1
+# Launch app (replace with your package)
+adb shell monkey -p com.example.myapp 1
 
 # Force stop app
-adb shell am force-stop com.selectcomfort.SleepIQ
+adb shell am force-stop com.example.myapp
 
 # Clear app data
-adb shell pm clear com.selectcomfort.SleepIQ
+adb shell pm clear com.example.myapp
 
 # Uninstall app
-adb uninstall com.selectcomfort.SleepIQ
+adb uninstall com.example.myapp
 
-# View logs
-adb logcat | grep SleepIQ
+# View logs (filter by tag)
+adb logcat | grep MyApp
 
 # Stop emulator
 adb emu kill
@@ -181,8 +242,8 @@ avdmanager list avd
 - Check internet connectivity in emulator
 
 ### App crashes
-- View logs: `adb logcat | grep -E "(SleepIQ|FATAL|CRASH)"`
-- Clear app data: `adb shell pm clear com.selectcomfort.SleepIQ`
+- View logs: `adb logcat | grep -E "(FATAL|CRASH)"`
+- Clear app data: `adb shell pm clear com.example.myapp`
 
 ### Slow emulator
 - Enable GPU acceleration: `-gpu host` (already enabled)

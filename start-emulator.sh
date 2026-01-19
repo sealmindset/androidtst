@@ -6,7 +6,7 @@ set -e
 ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
 export PATH="$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/platform-tools:$PATH"
 
-AVD_NAME="SleepIQ_Test_Device"
+AVD_NAME="Android_Test_Device"
 
 echo "=== Starting Android Emulator ==="
 echo "Device: $AVD_NAME"

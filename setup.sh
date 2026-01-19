@@ -90,7 +90,7 @@ echo ""
 echo "=== Creating AVD (Android Virtual Device) ==="
 
 # Create AVD with Google Play Store
-AVD_NAME="SleepIQ_Test_Device"
+AVD_NAME="Android_Test_Device"
 
 # Check if AVD already exists
 if avdmanager list avd | grep -q "$AVD_NAME"; then
@@ -114,5 +114,5 @@ echo "  2. Run: source ~/.zshrc"
 echo ""
 echo "Then you can:"
 echo "  - Start emulator: ./start-emulator.sh"
-echo "  - Install SleepIQ app: ./install-sleepiq.sh"
-echo "  - Run test harness: ./run-tests.sh"
+echo "  - Install app: ./install-app.sh <package-name>"
+echo "  - Run test harness: TARGET_PACKAGE=com.example.app ./run-tests.sh"
