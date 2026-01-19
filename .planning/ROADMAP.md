@@ -39,11 +39,11 @@ Plans:
 **Goal**: Remove all SleepIQ-specific code and make the harness work with any Android app
 **Depends on**: Phase 1
 **Research**: Unlikely (internal code cleanup)
-**Plans**: TBD
+**Plans**: 2
 
 Plans:
-- [ ] 02-01: Remove SleepIQ-specific references and hardcoded values
-- [ ] 02-02: Abstract app-specific logic into configurable parameters
+- [ ] 02-01: Generalize Python harness (rename class, configurable package, optional auth)
+- [ ] 02-02: Generalize shell scripts and documentation
 
 ### Phase 3: Proxy Integration
 **Goal**: Configure Android emulator to route all traffic through Burp Suite CE for interception
@@ -95,7 +95,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Configuration & Security | 2/2 | Complete | 2026-01-19 |
-| 2. Generalization | 0/2 | Not started | - |
+| 2. Generalization | 0/2 | Planned | - |
 | 3. Proxy Integration | 0/2 | Not started | - |
 | 4. APK Analysis Tooling | 0/2 | Not started | - |
 | 5. Code Browsing Workflow | 0/1 | Not started | - |
