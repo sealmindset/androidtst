@@ -1,6 +1,6 @@
-# SleepIQ Android Test Harness
+#Android Test Harness
 
-A test harness for running and testing the SleepIQ Android app in an emulated environment.
+A test harness for running and testing the Android app in an emulated environment.
 
 ## Prerequisites
 
@@ -37,7 +37,7 @@ source ~/.zshrc
 
 Wait for the emulator to fully boot (you'll see "Emulator Ready").
 
-### 4. Install SleepIQ App
+### 4. InstallApp
 
 ```bash
 ./install-sleepiq.sh
@@ -45,7 +45,7 @@ Wait for the emulator to fully boot (you'll see "Emulator Ready").
 
 This opens the Google Play Store on the emulator. You'll need to:
 1. Sign in to your Google Account (first time only)
-2. Click "Install" on the SleepIQ app page
+2. Click "Install" on theapp page
 
 ### 5. Run Tests
 
@@ -65,7 +65,7 @@ python3 test_harness.py
 |--------|---------|
 | `setup.sh` | One-time setup of Android SDK and emulator |
 | `start-emulator.sh` | Start the Android emulator |
-| `install-sleepiq.sh` | Open Play Store to install SleepIQ |
+| `install-sleepiq.sh` | Open Play Store to install|
 | `run-tests.sh` | Interactive shell-based test harness |
 | `test_harness.py` | Python test automation framework |
 
