@@ -101,6 +101,8 @@ TARGET_PACKAGE=com.example.myapp python3 test_harness.py
 | `decode-apk.sh` | Decode APK resources and manifest using apktool |
 | `analyze-apk.sh` | Unified APK analysis with security scan |
 | `search-code.sh` | Search decompiled code for patterns |
+| `frida_root_bypass.js` | Frida script to bypass root detection |
+| `frida_ssl_bypass.js` | Frida script to bypass SSL pinning |
 
 ## Proxy Integration
 
@@ -276,6 +278,88 @@ grep -i 'cleartextTrafficPermitted' decompiled/<app>/apktool/res/xml/*.xml
 ```bash
 grep -rE '(api_key|apikey|secret|password|token).*=' decompiled/<app>/jadx/sources/
 ```
+
+## Security Bypasses
+
+Use Frida scripts to bypass common security measures in apps.
+
+### Prerequisites
+
+Install Frida tools:
+```bash
+pip install frida-tools
+```
+
+Ensure the Android emulator is running and `frida-server` is installed on it:
+```bash
+# Download frida-server for your emulator architecture
+# Push to device and run as root
+adb push frida-server /data/local/tmp/
+adb shell "chmod 755 /data/local/tmp/frida-server"
+adb shell "/data/local/tmp/frida-server &"
+```
+
+### Root Detection Bypass
+
+Many apps detect rooted devices and refuse to run. Use `frida_root_bypass.js` to hide root status:
+
+```bash
+# Spawn app with root bypass
+frida -U -l frida_root_bypass.js -f com.example.app
+
+# Attach to running app
+frida -U -l frida_root_bypass.js com.example.app
+```
+
+**What it bypasses:**
+- File.exists() checks for su, Magisk, busybox
+- Runtime.exec() and ProcessBuilder su/which commands
+- Build.TAGS "test-keys" detection
+- System.getProperty() for ro.debuggable/ro.secure
+- PackageManager checks for root management apps
+- Native libc system() and access() calls
+- RootBeer library (if present)
+
+### SSL Pinning Bypass
+
+Apps with certificate pinning block traffic interception. Use `frida_ssl_bypass.js`:
+
+```bash
+# Spawn app with SSL bypass
+frida -U -l frida_ssl_bypass.js -f com.example.app
+```
+
+**What it bypasses:**
+- TrustManagerImpl.verifyChain
+- SSLContext.init with custom TrustManager
+- OkHttp CertificatePinner
+
+### Combining Bypasses
+
+Load multiple scripts for comprehensive bypass:
+```bash
+frida -U -l frida_root_bypass.js -l frida_ssl_bypass.js -f com.example.app
+```
+
+### Troubleshooting Frida
+
+**frida-server not running:**
+```bash
+adb shell "ps | grep frida"
+# If not running, start it:
+adb shell "/data/local/tmp/frida-server &"
+```
+
+**Permission denied:**
+```bash
+# frida-server needs root
+adb root
+adb shell "/data/local/tmp/frida-server &"
+```
+
+**App crashes on attach:**
+- Try spawning (`-f`) instead of attaching
+- Check logcat for crash reason: `adb logcat | grep -i frida`
 
 ## Configuration
 
