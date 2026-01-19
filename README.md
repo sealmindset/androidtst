@@ -102,6 +102,7 @@ TARGET_PACKAGE=com.example.myapp python3 test_harness.py
 | `analyze-apk.sh` | Unified APK analysis with security scan |
 | `search-code.sh` | Search decompiled code for patterns |
 | `frida_root_bypass.js` | Frida script to bypass root detection |
+| `frida_emulator_bypass.js` | Frida script to bypass emulator detection |
 | `frida_ssl_bypass.js` | Frida script to bypass SSL pinning |
 
 ## Proxy Integration
@@ -320,6 +321,28 @@ frida -U -l frida_root_bypass.js com.example.app
 - Native libc system() and access() calls
 - RootBeer library (if present)
 
+### Emulator Detection Bypass
+
+Some apps detect emulator environments and refuse to run. Use `frida_emulator_bypass.js` to appear as a real device:
+
+```bash
+# Spawn app with emulator bypass
+frida -U -l frida_emulator_bypass.js -f com.example.app
+
+# Attach to running app
+frida -U -l frida_emulator_bypass.js com.example.app
+```
+
+**What it bypasses:**
+- Build class fields (FINGERPRINT, MODEL, MANUFACTURER, BRAND, etc.)
+- TelephonyManager (IMEI, IMSI, phone number, carrier info)
+- File.exists() for qemu_pipe, goldfish, ranchu files
+- System.getProperty() and SystemProperties for emulator indicators
+- SensorManager availability checks
+- Native fopen() and access() for low-level file detection
+
+**Spoofed device:** Pixel 6 Pro (configurable in script)
+
 ### SSL Pinning Bypass
 
 Apps with certificate pinning block traffic interception. Use `frida_ssl_bypass.js`:
@@ -338,7 +361,11 @@ frida -U -l frida_ssl_bypass.js -f com.example.app
 
 Load multiple scripts for comprehensive bypass:
 ```bash
+# Root + SSL bypass
 frida -U -l frida_root_bypass.js -l frida_ssl_bypass.js -f com.example.app
+
+# All bypasses (root + emulator + SSL)
+frida -U -l frida_root_bypass.js -l frida_emulator_bypass.js -l frida_ssl_bypass.js -f com.example.app
 ```
 
 ### Troubleshooting Frida
