@@ -67,6 +67,17 @@ else
 fi
 echo ""
 
+# Check proxy status
+echo "Proxy Status:"
+PROXY_SETTING=$(adb -s "$DEVICE_ID" shell settings get global http_proxy 2>/dev/null)
+if [ -n "$PROXY_SETTING" ] && [ "$PROXY_SETTING" != ":0" ] && [ "$PROXY_SETTING" != "null" ]; then
+    echo "  Proxy: ENABLED ($PROXY_SETTING)"
+else
+    echo "  Proxy: DISABLED"
+    echo "  To enable: ./configure-proxy.sh"
+fi
+echo ""
+
 # Check if target app is installed (if TARGET_PACKAGE is set)
 if [ -n "$PACKAGE_NAME" ]; then
     if adb -s "$DEVICE_ID" shell pm list packages | grep -q "$PACKAGE_NAME"; then
