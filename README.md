@@ -99,6 +99,8 @@ TARGET_PACKAGE=com.example.myapp python3 test_harness.py
 | `extract-apk.sh` | Extract APK from installed app |
 | `decompile-apk.sh` | Decompile APK to Java source using jadx |
 | `decode-apk.sh` | Decode APK resources and manifest using apktool |
+| `analyze-apk.sh` | Unified APK analysis with security scan |
+| `search-code.sh` | Search decompiled code for patterns |
 
 ## Proxy Integration
 
@@ -158,6 +160,26 @@ adb shell settings get global http_proxy
 
 Decompile APKs to examine source code and resources.
 
+### Quick Analysis
+
+Run a complete analysis with one command:
+```bash
+./analyze-apk.sh com.example.app_v1.2.3.apk
+# or auto-select most recent:
+./analyze-apk.sh
+```
+
+This will:
+- Decompile to Java source (jadx)
+- Decode resources and manifest (apktool)
+- Scan for common security issues
+- Generate a summary report with:
+  - Permissions (highlighting dangerous ones)
+  - Exported components (attack surface)
+  - Network configuration issues
+  - Potential hardcoded secrets
+  - Network-related classes
+
 ### Prerequisites
 
 Install decompilation tools:
@@ -204,6 +226,34 @@ grep -r "secret" decompiled/<app>/jadx/sources/
 # Find network-related code
 grep -rl "HttpURLConnection\|OkHttp\|Retrofit" decompiled/<app>/jadx/sources/
 ```
+
+### Searching Code
+
+Use preset patterns for common security searches:
+```bash
+# Find hardcoded secrets
+./search-code.sh --preset secrets
+
+# Find network-related code
+./search-code.sh --preset network
+
+# Find crypto operations
+./search-code.sh --preset crypto
+
+# Find storage operations
+./search-code.sh --preset storage
+
+# Find authentication code
+./search-code.sh --preset auth
+
+# Custom pattern search
+./search-code.sh "api.example.com"
+
+# Search specific app
+./search-code.sh --preset secrets com.example.app
+```
+
+Available presets: `secrets`, `network`, `crypto`, `storage`, `auth`
 
 ### Security Analysis Tips
 
