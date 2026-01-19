@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Automated setup that takes a macOS with prerequisites and stands up a complete, ready-to-use Android security testing environment — emulator running, proxy configured, bypasses active, analysis tools available.
-**Current focus:** Phase 4 — APK Analysis Tooling
+**Current focus:** Phase 5 — Code Browsing Workflow
 
 ## Current Position
 
-Phase: 4 of 6 (APK Analysis Tooling)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-19 — Completed 04-01-PLAN.md
+Phase: 5 of 6 (Code Browsing Workflow)
+Plan: 0 of 1 in current phase
+Status: Ready to plan
+Last activity: 2026-01-19 — Completed Phase 4: APK Analysis Tooling
 
-Progress: █████░░░░░ 58%
+Progress: ██████░░░░ 67%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 6.9 min
-- Total execution time: 0.80 hours
+- Total plans completed: 8
+- Average duration: 6.1 min
+- Total execution time: 0.82 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: █████░░░░░ 58%
 | 1 | 2 | 17 min | 8.5 min |
 | 2 | 2 | 17 min | 8.5 min |
 | 3 | 2 | 11 min | 5.5 min |
-| 4 | 1 | 3 min | 3 min |
+| 4 | 2 | 6 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 11 min, 6 min, 5 min, 6 min, 3 min
+- Last 5 plans: 6 min, 5 min, 6 min, 3 min, 3 min
 - Trend: ↓
 
 ## Accumulated Context
@@ -59,6 +59,7 @@ Recent decisions affecting current work:
 - [03-02]: configure-proxy.sh supports BURP_PROXY env var (CLI > env > default)
 - [04-01]: Output structure decompiled/<app>/<tool>/ for multiple decompilation tools
 - [04-01]: Scripts auto-select most recent APK from apks/ if none specified
+- [04-02]: Dual tooling approach - jadx for Java source, apktool for manifest/resources
 
 ### Deferred Issues
 
