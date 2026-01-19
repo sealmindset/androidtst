@@ -1,0 +1,1143 @@
+{
+  "config": {
+    "configFile": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/playwright.config.ts",
+    "rootDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "test-results"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "api-tests",
+        "name": "api-tests",
+        "testDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/api-.*\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "web-portal-tests",
+        "name": "web-portal-tests",
+        "testDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/web-.*\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "auth-tests",
+        "name": "auth-tests",
+        "testDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/auth-.*\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "idor-tests",
+        "name": "idor-tests",
+        "testDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/idor-.*\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "error-disclosure-tests",
+        "name": "error-disclosure-tests",
+        "testDir": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/error-.*\\.spec\\.ts/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "error-disclosure.spec.ts",
+      "file": "error-disclosure.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Error Disclosure Security Tests",
+          "file": "error-disclosure.spec.ts",
+          "line": 16,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Legacy BAM Endpoint Disclosure",
+              "file": "error-disclosure.spec.ts",
+              "line": 36,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should not leak internal structure via getSoftware.jsp",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 952,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "\n[BAM] getSoftware.jsp with deviceId=\"12345\":\n"
+                            },
+                            {
+                              "text": "[BAM] Status: 400\n"
+                            },
+                            {
+                              "text": "[BAM] WARNING: Internal API structure leaked!\n"
+                            },
+                            {
+                              "text": "[BAM] Response: <?xml version='1.0' encoding='UTF-8'?><error><errorCode>1000</errorCode><errorText>Unable to find the file and no GA version is available. Request RequestSoftwareMessage{requestId='81958b55-d19c-439c-b4f6-dff73056f20d', deviceId='12345', deviceId2='********', deviceVersionStr='null', version='null', filename='null', accountNumberStr='null', softwareTypeStr='null', remoteAddress='null', generation='null', cdnSupported='false'}</errorText></error>\n"
+                            },
+                            {
+                              "text": "\n[BAM] getSoftware.jsp with deviceId=\"00000000-0000-0000-0000-000000000001\":\n"
+                            },
+                            {
+                              "text": "[BAM] Status: 400\n"
+                            },
+                            {
+                              "text": "[BAM] WARNING: Internal API structure leaked!\n"
+                            },
+                            {
+                              "text": "[BAM] Response: <?xml version='1.0' encoding='UTF-8'?><error><errorCode>1000</errorCode><errorText>Unable to find the file and no GA version is available. Request RequestSoftwareMessage{requestId='b9d574a8-8058-428c-a6a8-1019fd728491', deviceId='00000000-0000-0000-0000-000000000001', deviceId2='********', deviceVersionStr='null', version='null', filename='null', accountNumberStr='null', softwareTypeStr='null', remoteAddress='null', generation='null', cdnSupported='false'}</errorText></error>\n"
+                            },
+                            {
+                              "text": "\n[BAM] getSoftware.jsp with deviceId=\"' OR '1'='1\":\n"
+                            },
+                            {
+                              "text": "[BAM] Status: 400\n"
+                            },
+                            {
+                              "text": "[BAM] WARNING: Internal API structure leaked!\n"
+                            },
+                            {
+                              "text": "[BAM] Response: <?xml version='1.0' encoding='UTF-8'?><error><errorCode>1000</errorCode><errorText>Unable to find the file and no GA version is available. Request RequestSoftwareMessage{requestId='f7b3e5c9-5b2a-48b2-805f-3d1c8ac13e0d', deviceId='' OR '1'='1', deviceId2='********', deviceVersionStr='null', version='null', filename='null', accountNumberStr='null', softwareTypeStr='null', remoteAddress='null', generation='null', cdnSupported='false'}</errorText></error>\n"
+                            },
+                            {
+                              "text": "\n[BAM] getSoftware.jsp with deviceId=\"../../../etc/passwd\":\n"
+                            },
+                            {
+                              "text": "[BAM] Status: 400\n"
+                            },
+                            {
+                              "text": "[BAM] WARNING: Internal API structure leaked!\n"
+                            },
+                            {
+                              "text": "[BAM] Response: <?xml version='1.0' encoding='UTF-8'?><error><errorCode>1000</errorCode><errorText>Unable to find the file and no GA version is available. Request RequestSoftwareMessage{requestId='9f5c7da1-d65f-4180-8915-cb3cf07e9d5e', deviceId='../../../etc/passwd', deviceId2='********', deviceVersionStr='null', version='null', filename='null', accountNumberStr='null', softwareTypeStr='null', remoteAddress='null', generation='null', cdnSupported='false'}</errorText></error>\n"
+                            },
+                            {
+                              "text": "[BAM] Sensitive data found: internalPath\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:17:54.937Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-a6c13-ructure-via-getSoftware-jsp-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-b7587b66ebf334ebe926",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 39,
+                  "column": 9
+                },
+                {
+                  "title": "should not expose server time without authentication",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 202,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "\n[BAM] getTime.jsp response: timeMS=1767367076249\n"
+                            },
+                            {
+                              "text": "[BAM] Status: 200\n"
+                            },
+                            {
+                              "text": "[BAM] FINDING: Server time exposed without authentication\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:17:55.994Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-cbef6-time-without-authentication-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-81544cefb7566f920337",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 75,
+                  "column": 9
+                },
+                {
+                  "title": "should not leak config structure via getConfig.jsp",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1002,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "\n[BAM] getConfig.jsp test:\n"
+                            },
+                            {
+                              "text": "[BAM] URL: https://svcsleepiq.sleepnumber.com/bam/device/getConfig.jsp\n"
+                            },
+                            {
+                              "text": "[BAM] Status: 400\n"
+                            },
+                            {
+                              "text": "[BAM] Response: <?xml version='1.0' encoding='UTF-8'?><error><errorCode>1000</errorCode><errorText>deviceId must be specified!</errorText></error>\n"
+                            },
+                            {
+                              "text": "\n[BAM] getConfig.jsp test:\n"
+                            },
+                            {
+                              "text": "[BAM] URL: https://svcsleepiq.sleepnumber.com/bam/device/getConfig.jsp?deviceId=test\n"
+                            },
+                            {
+                              "text": "[BAM] Status: 400\n"
+                            },
+                            {
+                              "text": "[BAM] Response: <?xml version='1.0' encoding='UTF-8'?><error><errorCode>1000</errorCode><errorText>deviceId must be specified!</errorText></error>\n"
+                            },
+                            {
+                              "text": "\n[BAM] getConfig.jsp test:\n"
+                            },
+                            {
+                              "text": "[BAM] URL: https://svcsleepiq.sleepnumber.com/bam/device/getConfig.jsp?deviceId=1&accountId=1\n"
+                            },
+                            {
+                              "text": "[BAM] Status: 400\n"
+                            },
+                            {
+                              "text": "[BAM] Response: <?xml version='1.0' encoding='UTF-8'?><error><errorCode>1000</errorCode><errorText>deviceId must be specified!</errorText></error>\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:17:56.244Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-3c443-structure-via-getConfig-jsp-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-f18f88dd8d333e3faa1c",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 88,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "REST API Error Disclosure",
+              "file": "error-disclosure.spec.ts",
+              "line": 112,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should return generic errors for invalid endpoints",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1024,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "\n[API] Invalid endpoint: /rest/nonexistent\n"
+                            },
+                            {
+                              "text": "[API] Status: 404\n"
+                            },
+                            {
+                              "text": "[API] Verbose error: 'GET /rest/nonexistent'\n"
+                            },
+                            {
+                              "text": "\n[API] Invalid endpoint: /rest/admin\n"
+                            },
+                            {
+                              "text": "[API] Status: 404\n"
+                            },
+                            {
+                              "text": "[API] Verbose error: 'GET /rest/admin'\n"
+                            },
+                            {
+                              "text": "\n[API] Invalid endpoint: /rest/debug\n"
+                            },
+                            {
+                              "text": "[API] Status: 404\n"
+                            },
+                            {
+                              "text": "[API] Verbose error: 'GET /rest/debug'\n"
+                            },
+                            {
+                              "text": "\n[API] Invalid endpoint: /rest/internal/status\n"
+                            },
+                            {
+                              "text": "[API] Status: 404\n"
+                            },
+                            {
+                              "text": "[API] Verbose error: 'GET /rest/internal/status'\n"
+                            },
+                            {
+                              "text": "\n[API] Invalid endpoint: /rest/../../../etc/passwd\n"
+                            },
+                            {
+                              "text": "[API] Status: 404\n"
+                            },
+                            {
+                              "text": "[API] WARNING: Path traversal reflected in response!\n"
+                            },
+                            {
+                              "text": "[API] Verbose error: 'GET /etc/passwd'\n"
+                            },
+                            {
+                              "text": "\n[API] Invalid endpoint: /rest/sleeper/../../admin\n"
+                            },
+                            {
+                              "text": "[API] Status: 404\n"
+                            },
+                            {
+                              "text": "[API] Verbose error: 'GET /admin'\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:17:57.302Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-cfb89-rrors-for-invalid-endpoints-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-6e54fe689b52ad7c05f9",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 115,
+                  "column": 9
+                },
+                {
+                  "title": "should not leak structure on malformed requests",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 689,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "\n[API] Malformed request test:\n"
+                            },
+                            {
+                              "text": "[API] PUT https://prod-api.sleepiq.sleepnumber.com/rest/login\n"
+                            },
+                            {
+                              "text": "[API] Status: 400\n"
+                            },
+                            {
+                              "text": "\n[API] Malformed request test:\n"
+                            },
+                            {
+                              "text": "[API] PUT https://prod-api.sleepiq.sleepnumber.com/rest/login\n"
+                            },
+                            {
+                              "text": "[API] Status: 400\n"
+                            },
+                            {
+                              "text": "\n[API] Malformed request test:\n"
+                            },
+                            {
+                              "text": "[API] PUT https://prod-api.sleepiq.sleepnumber.com/rest/login\n"
+                            },
+                            {
+                              "text": "[API] Status: 400\n"
+                            },
+                            {
+                              "text": "\n[API] Malformed request test:\n"
+                            },
+                            {
+                              "text": "[API] GET https://prod-api.sleepiq.sleepnumber.com/rest/bed/null/status\n"
+                            },
+                            {
+                              "text": "[API] Status: 401\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:17:58.384Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-1efb7-cture-on-malformed-requests-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-8f553cb504761501dd4e",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 145,
+                  "column": 9
+                },
+                {
+                  "title": "should not expose internal paths in errors",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 166,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "\n[API] Internal path disclosure test:\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:17:59.136Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-8f43c-se-internal-paths-in-errors-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-64d201eaefd2df5c4cc4",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 199,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "ECIM Error Disclosure",
+              "file": "error-disclosure.spec.ts",
+              "line": 224,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should not leak AWS internals in error responses",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1009,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "\n[ECIM] Endpoint: /health\n"
+                            },
+                            {
+                              "text": "[ECIM] Status: 403\n"
+                            },
+                            {
+                              "text": "[ECIM] AWS Headers exposed:\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-requestid: d7d1417e-e535-404f-b0b2-c017a196a6cb\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-errortype: MissingAuthenticationTokenException\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amz-apigw-id: WkAyPFtwIAMF2hA=\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-trace-id: Root=1-6957e1a7-40180d322644777817479a8a\n"
+                            },
+                            {
+                              "text": "[ECIM] Sensitive headers: x-amzn-requestid, x-amz-apigw-id, x-amzn-trace-id, x-amzn-errortype, server\n"
+                            },
+                            {
+                              "text": "\n[ECIM] Endpoint: /admin\n"
+                            },
+                            {
+                              "text": "[ECIM] Status: 403\n"
+                            },
+                            {
+                              "text": "[ECIM] AWS Headers exposed:\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-requestid: 056967c2-f73c-4db4-b959-060d634922e4\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-errortype: MissingAuthenticationTokenException\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amz-apigw-id: WkAyRGtZIAMFR8g=\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-trace-id: Root=1-6957e1a7-1c7ddd512e7d43124e60bc0e\n"
+                            },
+                            {
+                              "text": "[ECIM] Sensitive headers: x-amzn-requestid, x-amz-apigw-id, x-amzn-trace-id, x-amzn-errortype, server\n"
+                            },
+                            {
+                              "text": "\n[ECIM] Endpoint: /internal\n"
+                            },
+                            {
+                              "text": "[ECIM] Status: 403\n"
+                            },
+                            {
+                              "text": "[ECIM] AWS Headers exposed:\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-requestid: 06246c25-5cd6-4af1-8ecf-0e22e9d3c739\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-errortype: MissingAuthenticationTokenException\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amz-apigw-id: WkAySEt5IAMFZPw=\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-trace-id: Root=1-6957e1a7-6fa3585b51c749284cfa49a4\n"
+                            },
+                            {
+                              "text": "[ECIM] Sensitive headers: x-amzn-requestid, x-amz-apigw-id, x-amzn-trace-id, x-amzn-errortype, server\n"
+                            },
+                            {
+                              "text": "\n[ECIM] Endpoint: /api/users\n"
+                            },
+                            {
+                              "text": "[ECIM] Status: 403\n"
+                            },
+                            {
+                              "text": "[ECIM] AWS Headers exposed:\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-requestid: 1b9eb4da-d9ec-4129-bf98-6a707dc5d2f8\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-errortype: MissingAuthenticationTokenException\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amz-apigw-id: WkAyTHD_IAMFYog=\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-trace-id: Root=1-6957e1a7-04f9ee8435dc2dc319f4b2b5\n"
+                            },
+                            {
+                              "text": "[ECIM] Sensitive headers: x-amzn-requestid, x-amz-apigw-id, x-amzn-trace-id, x-amzn-errortype, server\n"
+                            },
+                            {
+                              "text": "\n[ECIM] Endpoint: /metrics\n"
+                            },
+                            {
+                              "text": "[ECIM] Status: 403\n"
+                            },
+                            {
+                              "text": "[ECIM] AWS Headers exposed:\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-requestid: 2adf036d-7dec-4842-9859-3eed8fddc136\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-errortype: MissingAuthenticationTokenException\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amz-apigw-id: WkAyVHULIAMF6Gw=\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-trace-id: Root=1-6957e1a8-0a66bb244b6213c50bb5425e\n"
+                            },
+                            {
+                              "text": "[ECIM] Sensitive headers: x-amzn-requestid, x-amz-apigw-id, x-amzn-trace-id, x-amzn-errortype, server\n"
+                            },
+                            {
+                              "text": "\n[ECIM] Endpoint: /graphql\n"
+                            },
+                            {
+                              "text": "[ECIM] Status: 403\n"
+                            },
+                            {
+                              "text": "[ECIM] AWS Headers exposed:\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-requestid: 423554c9-669f-4b97-812a-73e2b041a84a\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-errortype: MissingAuthenticationTokenException\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amz-apigw-id: WkAyWHOaIAMFt4g=\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-trace-id: Root=1-6957e1a8-5cbe37a478d1ff8379289449\n"
+                            },
+                            {
+                              "text": "[ECIM] Sensitive headers: x-amzn-requestid, x-amz-apigw-id, x-amzn-trace-id, x-amzn-errortype, server\n"
+                            },
+                            {
+                              "text": "\n[ECIM] Endpoint: /nonexistent\n"
+                            },
+                            {
+                              "text": "[ECIM] Status: 403\n"
+                            },
+                            {
+                              "text": "[ECIM] AWS Headers exposed:\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-requestid: a4f43457-76cc-4f11-9cca-782966999a0f\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-errortype: MissingAuthenticationTokenException\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amz-apigw-id: WkAyYEO1oAMFbbA=\n"
+                            },
+                            {
+                              "text": "[ECIM]   x-amzn-trace-id: Root=1-6957e1a8-12bf09b2336159887a41dc7c\n"
+                            },
+                            {
+                              "text": "[ECIM] Sensitive headers: x-amzn-requestid, x-amz-apigw-id, x-amzn-trace-id, x-amzn-errortype, server\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:17:59.355Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-cdf3e-nternals-in-error-responses-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-ffd1e64d2cad3fe6fe99",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 227,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "HTTP Method Disclosure",
+              "file": "error-disclosure.spec.ts",
+              "line": 265,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should not expose all HTTP methods via OPTIONS",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 497,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "\n[HTTP] OPTIONS /rest/login\n"
+                            },
+                            {
+                              "text": "[HTTP] Allow header: GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH\n"
+                            },
+                            {
+                              "text": "[HTTP] WARNING: TRACE method enabled (XST risk)\n"
+                            },
+                            {
+                              "text": "[HTTP] INFO: DELETE method available\n"
+                            },
+                            {
+                              "text": "\n[HTTP] OPTIONS /rest/bed\n"
+                            },
+                            {
+                              "text": "[HTTP] Allow header: undefined\n"
+                            },
+                            {
+                              "text": "\n[HTTP] OPTIONS /rest/sleeper\n"
+                            },
+                            {
+                              "text": "[HTTP] Allow header: undefined\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:18:00.435Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-a4c0f-ll-HTTP-methods-via-OPTIONS-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-301ba30dfd85859ece60",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 268,
+                  "column": 9
+                },
+                {
+                  "title": "should handle unexpected HTTP methods gracefully",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30003,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "\n[HTTP] TRACE /rest/bed: Status 405\n"
+                            },
+                            {
+                              "text": "\n# Security Analysis Report\n\nTotal Requests Analyzed: 24\n\n## Summary\n- Critical Findings: 0\n- High Findings: 0\n- Verbose Errors: 6\n\n## Detailed Findings\n\n### https://svcsleepiq.sleepnumber.com/bam/device/getSoftware.jsp?deviceId=..%2F..%2F..%2Fetc%2Fpasswd\nStatus: 400\n\n**Sensitive Data:**\n- [MEDIUM] Internal Path: 1 matches\n\n### https://prod-api.sleepiq.sleepnumber.com/rest/nonexistent\nStatus: 404\n\n**Verbose Errors:**\n- 'GET /rest/nonexistent'...\n\n**Recommendations:**\n- Implement generic error messages for production\n- Suppress internal headers (X-Amzn-*, Server version)\n\n### https://prod-api.sleepiq.sleepnumber.com/rest/admin\nStatus: 404\n\n**Verbose Errors:**\n- 'GET /rest/admin'...\n\n**Recommendations:**\n- Implement generic error messages for production\n- Suppress internal headers (X-Amzn-*, Server version)\n\n### https://prod-api.sleepiq.sleepnumber.com/rest/debug\nStatus: 404\n\n**Verbose Errors:**\n- 'GET /rest/debug'...\n\n**Recommendations:**\n- Implement generic error messages for production\n- Suppress internal headers (X-Amzn-*, Server version)\n\n### https://prod-api.sleepiq.sleepnumber.com/rest/internal/status\nStatus: 404\n\n**Sensitive Data:**\n- [MEDIUM] Internal Path: 1 matches\n\n**Verbose Errors:**\n- 'GET /rest/internal/status'...\n\n**Recommendations:**\n- Implement generic error messages for production\n- Suppress internal headers (X-Amzn-*, Server version)\n\n### https://prod-api.sleepiq.sleepnumber.com/etc/passwd\nStatus: 404\n\n**Sensitive Data:**\n- [MEDIUM] Internal Path: 1 matches\n\n**Verbose Errors:**\n- 'GET /etc/passwd'...\n\n**Recommendations:**\n- Implement generic error messages for production\n- Suppress internal headers (X-Amzn-*, Server version)\n\n### https://prod-api.sleepiq.sleepnumber.com/admin\nStatus: 404\n\n**Verbose Errors:**\n- 'GET /admin'...\n\n**Recommendations:**\n- Implement generic error messages for production\n- Suppress internal headers (X-Amzn-*, Server version)\n\n\n"
+                            },
+                            {
+                              "text": "[HTTP] CONNECT: Request failed (expected)\n"
+                            },
+                            {
+                              "text": "[HTTP] PROPFIND: Request failed (expected)\n"
+                            },
+                            {
+                              "text": "[HTTP] MOVE: Request failed (expected)\n"
+                            },
+                            {
+                              "text": "[HTTP] COPY: Request failed (expected)\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:18:00.994Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-b7f38-ted-HTTP-methods-gracefully-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-6a2a5cdf785ec438ea5d",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 292,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Content-Type Error Handling",
+              "file": "error-disclosure.spec.ts",
+              "line": 315,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should handle wrong Content-Type gracefully",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1085,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "\n[CT] Content-Type: application/xml\n"
+                            },
+                            {
+                              "text": "[CT] Status: 401\n"
+                            },
+                            {
+                              "text": "\n[CT] Content-Type: text/html\n"
+                            },
+                            {
+                              "text": "[CT] Status: 401\n"
+                            },
+                            {
+                              "text": "\n[CT] Content-Type: application/x-www-form-urlencoded\n"
+                            },
+                            {
+                              "text": "[CT] Status: 500\n"
+                            },
+                            {
+                              "text": "\n[CT] Content-Type: multipart/form-data\n"
+                            },
+                            {
+                              "text": "[CT] Status: 401\n"
+                            },
+                            {
+                              "text": "\n[CT] Content-Type: text/plain\n"
+                            },
+                            {
+                              "text": "[CT] Status: 401\n"
+                            },
+                            {
+                              "text": "\n[CT] Content-Type: application/octet-stream\n"
+                            },
+                            {
+                              "text": "[CT] Status: 401\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:18:31.392Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-b9497-ong-Content-Type-gracefully-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-f7b095a0ba90411f620e",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 318,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Debug/Trace Header Exposure",
+              "file": "error-disclosure.spec.ts",
+              "line": 347,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should not expose debug info via special headers",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "error-disclosure-tests",
+                      "projectName": "error-disclosure-tests",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 988,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "\n[DEBUG] Request headers: {\"X-Debug\":\"true\"}\n"
+                            },
+                            {
+                              "text": "[DEBUG] Status: 401\n"
+                            },
+                            {
+                              "text": "\n[DEBUG] Request headers: {\"X-Debug-Mode\":\"1\"}\n"
+                            },
+                            {
+                              "text": "[DEBUG] Status: 401\n"
+                            },
+                            {
+                              "text": "\n[DEBUG] Request headers: {\"X-Trace\":\"enabled\"}\n"
+                            },
+                            {
+                              "text": "[DEBUG] Status: 401\n"
+                            },
+                            {
+                              "text": "\n[DEBUG] Request headers: {\"X-Development\":\"true\"}\n"
+                            },
+                            {
+                              "text": "[DEBUG] Status: 401\n"
+                            },
+                            {
+                              "text": "\n[DEBUG] Request headers: {\"Debug\":\"true\"}\n"
+                            },
+                            {
+                              "text": "[DEBUG] Status: 401\n"
+                            },
+                            {
+                              "text": "\n[DEBUG] Request headers: {\"X-Custom-Debug-Header\":\"verbose\"}\n"
+                            },
+                            {
+                              "text": "[DEBUG] Status: 401\n"
+                            },
+                            {
+                              "text": "\n# Security Analysis Report\n\nTotal Requests Analyzed: 6\n\n## Summary\n- Critical Findings: 0\n- High Findings: 0\n- Verbose Errors: 0\n\n## Detailed Findings\n\n\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-01-02T15:18:32.554Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/rob.vance@sleepnumber.com/Documents/GitHub/siqassess/android-test-harness/playwright-burp-harness/test-results/error-disclosure-Error-Dis-052e6-ug-info-via-special-headers-error-disclosure-tests/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "089c2865914d55eb9a16-61a26a74129f8747fc1b",
+                  "file": "error-disclosure.spec.ts",
+                  "line": 350,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-02T15:17:54.594Z",
+    "duration": 38982.509999999995,
+    "expected": 10,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

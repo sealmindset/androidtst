@@ -1,0 +1,35 @@
+{
+  "name": "playwright-burp-harness",
+  "version": "1.0.0",
+  "description": "Playwright + Burp Security Test Harness for SleepIQ API",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:auth": "npx playwright test --project=auth-tests",
+    "test:idor": "npx playwright test --project=idor-tests",
+    "test:error": "npx playwright test --project=error-disclosure-tests",
+    "test:api": "npx playwright test --project=api-tests",
+    "test:web": "npx playwright test --project=web-portal-tests",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "report": "npx playwright show-report",
+    "check-burp": "curl -s -o /dev/null -w '%{http_code}' --proxy http://127.0.0.1:8080 https://example.com || echo 'Burp not running on port 8080'"
+  },
+  "keywords": [
+    "security",
+    "testing",
+    "playwright",
+    "burp",
+    "sleepiq"
+  ],
+  "author": "Security Assessment Team",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@playwright/test": "^1.57.0",
+    "playwright": "^1.57.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
