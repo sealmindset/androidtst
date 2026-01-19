@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Automated setup that takes a macOS with prerequisites and stands up a complete, ready-to-use Android security testing environment — emulator running, proxy configured, bypasses active, analysis tools available.
-**Current focus:** Phase 5 — Code Browsing Workflow
+**Current focus:** Phase 6 — Security Bypasses
 
 ## Current Position
 
-Phase: 5 of 6 (Code Browsing Workflow)
-Plan: 0 of 1 in current phase
+Phase: 6 of 6 (Security Bypasses)
+Plan: 0 of 2 in current phase
 Status: Ready to plan
-Last activity: 2026-01-19 — Completed Phase 4: APK Analysis Tooling
+Last activity: 2026-01-19 — Completed Phase 5: Code Browsing Workflow
 
-Progress: ██████░░░░ 67%
+Progress: ████████░░ 83%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 6.1 min
-- Total execution time: 0.82 hours
+- Total plans completed: 9
+- Average duration: 6.4 min
+- Total execution time: 0.97 hours
 
 **By Phase:**
 
@@ -31,10 +31,11 @@ Progress: ██████░░░░ 67%
 | 2 | 2 | 17 min | 8.5 min |
 | 3 | 2 | 11 min | 5.5 min |
 | 4 | 2 | 6 min | 3 min |
+| 5 | 1 | 9 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 5 min, 6 min, 3 min, 3 min
-- Trend: ↓
+- Last 5 plans: 5 min, 6 min, 3 min, 3 min, 9 min
+- Trend: →
 
 ## Accumulated Context
 
@@ -60,6 +61,8 @@ Recent decisions affecting current work:
 - [04-01]: Output structure decompiled/<app>/<tool>/ for multiple decompilation tools
 - [04-01]: Scripts auto-select most recent APK from apks/ if none specified
 - [04-02]: Dual tooling approach - jadx for Java source, apktool for manifest/resources
+- [05-01]: Unified analysis workflow - analyze-apk.sh combines decompilation + security scan
+- [05-01]: Preset patterns for code search - secrets, network, crypto, storage, auth
 
 ### Deferred Issues
 

@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Generalization** - Remove SleepIQ-specific code, make harness app-agnostic
 - [x] **Phase 3: Proxy Integration** - Configure emulator traffic routing through Burp Suite CE
 - [x] **Phase 4: APK Analysis Tooling** - Integrate jadx and apktool for decompilation
-- [ ] **Phase 5: Code Browsing Workflow** - Add workflow for examining decompiled code
+- [x] **Phase 5: Code Browsing Workflow** - Add workflow for examining decompiled code
 - [ ] **Phase 6: Security Bypasses** - Extend Frida scripts for root/emulator detection bypass
 
 ## Phase Details
@@ -74,7 +74,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: Code browsing scripts and output organization
+- [x] 05-01: Code browsing scripts and output organization
 
 ### Phase 6: Security Bypasses
 **Goal**: Extend Frida scripts to bypass root detection and emulator detection
@@ -98,5 +98,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Generalization | 2/2 | Complete | 2026-01-19 |
 | 3. Proxy Integration | 2/2 | Complete | 2026-01-19 |
 | 4. APK Analysis Tooling | 2/2 | Complete | 2026-01-19 |
-| 5. Code Browsing Workflow | 0/1 | Not started | - |
+| 5. Code Browsing Workflow | 1/1 | Complete | 2026-01-19 |
 | 6. Security Bypasses | 0/2 | Not started | - |
