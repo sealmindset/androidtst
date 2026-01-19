@@ -84,7 +84,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 06-01: Root detection bypass Frida script
+- [x] 06-01: Root detection bypass Frida script
 - [ ] 06-02: Emulator detection bypass Frida script
 
 ## Progress
@@ -99,4 +99,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Proxy Integration | 2/2 | Complete | 2026-01-19 |
 | 4. APK Analysis Tooling | 2/2 | Complete | 2026-01-19 |
 | 5. Code Browsing Workflow | 1/1 | Complete | 2026-01-19 |
-| 6. Security Bypasses | 0/2 | Not started | - |
+| 6. Security Bypasses | 1/2 | In progress | - |
