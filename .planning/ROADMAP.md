@@ -64,7 +64,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 04-01: jadx integration for Java source decompilation
+- [x] 04-01: jadx integration for Java source decompilation
 - [ ] 04-02: apktool integration for resource extraction
 
 ### Phase 5: Code Browsing Workflow
@@ -97,6 +97,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Configuration & Security | 2/2 | Complete | 2026-01-19 |
 | 2. Generalization | 2/2 | Complete | 2026-01-19 |
 | 3. Proxy Integration | 2/2 | Complete | 2026-01-19 |
-| 4. APK Analysis Tooling | 0/2 | Not started | - |
+| 4. APK Analysis Tooling | 1/2 | In progress | - |
 | 5. Code Browsing Workflow | 0/1 | Not started | - |
 | 6. Security Bypasses | 0/2 | Not started | - |
