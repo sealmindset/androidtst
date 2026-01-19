@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Automated setup that takes a macOS with prerequisites and stands up a complete, ready-to-use Android security testing environment — emulator running, proxy configured, bypasses active, analysis tools available.
-**Current focus:** Phase 2 — Generalization
+**Current focus:** Phase 3 — Proxy Integration
 
 ## Current Position
 
-Phase: 2 of 6 (Generalization)
-Plan: 1 of 2 in current phase
-Status: Plan 02-01 complete, 02-02 ready
-Last activity: 2026-01-19 — Completed Plan 02-01: Generalize Python Harness
+Phase: 3 of 6 (Proxy Integration)
+Plan: 0 of 2 in current phase
+Status: Phase 2 complete, ready to plan Phase 3
+Last activity: 2026-01-19 — Completed Phase 2: Generalization
 
-Progress: ██░░░░░░░░ 25%
+Progress: ███░░░░░░░ 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 9.3 min
-- Total execution time: 0.47 hours
+- Total plans completed: 4
+- Average duration: 8.5 min
+- Total execution time: 0.57 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 2 | 17 min | 8.5 min |
-| 2 | 1 | 11 min | 11 min |
+| 2 | 2 | 17 min | 8.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 9 min, 8 min, 11 min
-- Trend: —
+- Last 5 plans: 9 min, 8 min, 11 min, 6 min
+- Trend: ↓
 
 ## Accumulated Context
 
@@ -50,6 +50,8 @@ Recent decisions affecting current work:
 - [02-01]: Config module uses Optional types - credentials not required on import
 - [02-01]: Template files prefixed with `example_` to indicate they need customization
 - [02-01]: `CUSTOMIZE` comments mark all app-specific code sections
+- [02-02]: Shell scripts accept package as argument OR from TARGET_PACKAGE env var
+- [02-02]: AVD uses generic name `Android_Test_Device`
 
 ### Deferred Issues
 
@@ -61,6 +63,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-19T20:30:00Z
-Stopped at: Completed Plan 02-01: Generalize Python Harness
+Last session: 2026-01-19T20:52:00Z
+Stopped at: Completed Phase 2: Generalization
 Resume file: None

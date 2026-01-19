@@ -17,7 +17,7 @@ None
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Configuration & Security** - Replace hardcoded credentials with env vars, secure temp file handling
-- [ ] **Phase 2: Generalization** - Remove SleepIQ-specific code, make harness app-agnostic
+- [x] **Phase 2: Generalization** - Remove SleepIQ-specific code, make harness app-agnostic
 - [ ] **Phase 3: Proxy Integration** - Configure emulator traffic routing through Burp Suite CE
 - [ ] **Phase 4: APK Analysis Tooling** - Integrate jadx and apktool for decompilation
 - [ ] **Phase 5: Code Browsing Workflow** - Add workflow for examining decompiled code
@@ -43,7 +43,7 @@ Plans:
 
 Plans:
 - [x] 02-01: Generalize Python harness (rename class, configurable package, optional auth)
-- [ ] 02-02: Generalize shell scripts and documentation
+- [x] 02-02: Generalize shell scripts and documentation
 
 ### Phase 3: Proxy Integration
 **Goal**: Configure Android emulator to route all traffic through Burp Suite CE for interception
@@ -95,7 +95,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Configuration & Security | 2/2 | Complete | 2026-01-19 |
-| 2. Generalization | 1/2 | In Progress | - |
+| 2. Generalization | 2/2 | Complete | 2026-01-19 |
 | 3. Proxy Integration | 0/2 | Not started | - |
 | 4. APK Analysis Tooling | 0/2 | Not started | - |
 | 5. Code Browsing Workflow | 0/1 | Not started | - |
