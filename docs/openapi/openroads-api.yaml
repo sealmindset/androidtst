@@ -7,6 +7,23 @@ info:
     ## Authentication
     Most endpoints require an `api_key` query parameter obtained from the `/authenticate` endpoint.
 
+    ## Required Query Parameters (ALL requests)
+    Every request must include these query parameters:
+    - `deviceId` - URL-encoded device identifier (16-char hex string)
+    - `versionId` - URL-encoded app version (e.g., "1.3.6")
+    - `api_key` - Session token (except for login/register)
+
+    ## Headers (ALL requests)
+    ```
+    Accept: application/json
+    Content-Type: application/json
+    ```
+
+    ## Example Request
+    ```
+    POST /authenticate?deviceId=fa0113a1aefe6a1d&versionId=1.3.6
+    ```
+
     ## Base URL
     All endpoints are relative to `https://hydrocarbon-xl.herokuapp.com/`
   version: 1.3.6
@@ -30,6 +47,9 @@ paths:
       tags:
         - Authentication
       security: []
+      parameters:
+        - $ref: '#/components/parameters/deviceId'
+        - $ref: '#/components/parameters/versionId'
       requestBody:
         required: true
         content:
@@ -684,6 +704,36 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
 
 components:
+  parameters:
+    deviceId:
+      name: deviceId
+      in: query
+      required: true
+      schema:
+        type: string
+        pattern: '^[a-fA-F0-9]{16}$'
+        example: fa0113a1aefe6a1d
+      description: |
+        URL-encoded device identifier. Use android_id or generate a 16-character hex string.
+        Different deviceId values are treated as different devices for device limiting.
+
+    versionId:
+      name: versionId
+      in: query
+      required: true
+      schema:
+        type: string
+        example: "1.3.6"
+      description: URL-encoded app version string
+
+    apiKeyParam:
+      name: api_key
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Session API key obtained from /authenticate
+
   securitySchemes:
     apiKeyQuery:
       type: apiKey
