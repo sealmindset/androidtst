@@ -106,6 +106,63 @@ TARGET_PACKAGE=com.example.myapp python3 test_harness.py
 | `frida_ssl_bypass.js` | Frida script to bypass SSL pinning |
 | `frida_device_id_spoofer.js` | Frida script to spoof device ID for multi-device use |
 | `change-device-id.sh` | Change emulator android_id (no root/frida needed) |
+| `api_extractor` | **Full API reverse engineering pipeline** |
+
+## API Extraction (Reverse Engineering)
+
+Extract complete API documentation from any installed Android app.
+
+### Quick Start
+
+```bash
+# Extract APIs from an installed app
+./api_extractor com.example.app
+
+# Or from an existing APK file
+./api_extractor --apk path/to/app.apk
+```
+
+### What It Does
+
+1. **Extracts APK** from the installed app
+2. **Decompiles** with jadx to Java source
+3. **Analyzes** code for:
+   - API endpoints and URLs
+   - Authentication patterns (login, tokens, sessions)
+   - API keys (Google, AWS, Firebase, etc.)
+   - HTTP request patterns (headers, methods)
+   - Data models and JSON fields
+4. **Generates documentation**:
+   - `docs/<app>/api_reference.md` - Complete endpoint reference
+   - `docs/<app>/authentication.md` - Auth flow documentation
+   - `docs/<app>/api_keys.md` - Discovered secrets
+   - `docs/<app>/openapi/api.yaml` - OpenAPI 3.0 spec
+
+### Example Output
+
+```bash
+./api_extractor openroads.fueldiscountapp
+
+# Output:
+# docs/fueldiscountapp/
+# ├── README.md              # Summary and quick start
+# ├── api_reference.md       # All endpoints with examples
+# ├── authentication.md      # Login flow, tokens, sessions
+# ├── api_keys.md            # Google Maps key, etc.
+# ├── request_patterns.md    # Headers, methods, params
+# ├── data_models.md         # JSON fields
+# ├── raw_urls.txt           # All discovered URLs
+# ├── raw_endpoints.txt      # All discovered endpoints
+# └── openapi/
+#     └── api.yaml           # Import into Postman/Swagger
+```
+
+### Use Cases
+
+- **Security testing**: Find hidden endpoints, exposed keys
+- **API documentation**: Generate docs for undocumented APIs
+- **Interoperability**: Use app APIs from scripts/tools
+- **Research**: Understand how apps communicate
 
 ## Proxy Integration
 

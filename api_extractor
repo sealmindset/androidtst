@@ -1,0 +1,813 @@
+#!/bin/bash
+#
+# API Extractor - Reverse Engineer Android App APIs
+#
+# Automates the complete workflow:
+# 1. Extract APK from installed app
+# 2. Decompile with jadx
+# 3. Analyze code for APIs, endpoints, keys
+# 4. Generate comprehensive documentation
+#
+# Usage:
+#   ./api_extractor <package_name>
+#   ./api_extractor com.example.app
+#   ./api_extractor --apk path/to/app.apk
+#
+# Output:
+#   docs/<app_name>/api_reference.md
+#   docs/<app_name>/authentication.md
+#   docs/<app_name>/api_keys.md
+#   docs/<app_name>/openapi/api.yaml
+#
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+APKS_DIR="${SCRIPT_DIR}/apks"
+DECOMPILED_DIR="${SCRIPT_DIR}/decompiled"
+DOCS_DIR="${SCRIPT_DIR}/docs"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+#=============================================================================
+# Helper Functions
+#=============================================================================
+
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1" >&2
+}
+
+log_success() {
+    echo -e "${GREEN}[OK]${NC} $1" >&2
+}
+
+log_warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1" >&2
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1" >&2
+}
+
+log_section() {
+    echo "" >&2
+    echo -e "${GREEN}=== $1 ===${NC}" >&2
+    echo "" >&2
+}
+
+check_dependencies() {
+    local missing=0
+
+    if ! command -v jadx &> /dev/null; then
+        log_error "jadx not found. Install with: brew install jadx"
+        missing=1
+    fi
+
+    if ! command -v adb &> /dev/null; then
+        log_error "adb not found. Install Android SDK platform-tools"
+        missing=1
+    fi
+
+    if [ $missing -eq 1 ]; then
+        exit 1
+    fi
+}
+
+usage() {
+    echo "Usage: $0 <package_name>"
+    echo "       $0 --apk <path_to_apk>"
+    echo ""
+    echo "Examples:"
+    echo "  $0 com.example.app           # Extract from installed app"
+    echo "  $0 --apk myapp.apk           # Use existing APK file"
+    echo ""
+    echo "Output is written to docs/<app_name>/"
+    exit 1
+}
+
+#=============================================================================
+# APK Extraction
+#=============================================================================
+
+extract_apk() {
+    local package="$1"
+
+    log_section "Extracting APK: $package"
+
+    # Check if app is installed
+    if ! adb shell pm list packages | grep -q "$package"; then
+        log_error "Package not installed: $package"
+        log_info "Install the app first, then run this script"
+        exit 1
+    fi
+
+    # Get APK path(s)
+    local apk_paths=$(adb shell pm path "$package" | sed 's/package://' | tr -d '\r')
+
+    if [ -z "$apk_paths" ]; then
+        log_error "Could not find APK path for $package"
+        exit 1
+    fi
+
+    # Get version
+    local version=$(adb shell dumpsys package "$package" | grep versionName | head -1 | sed 's/.*versionName=//' | tr -d '\r' | tr ' ' '_')
+    version=${version:-"unknown"}
+
+    # Create output directory
+    mkdir -p "$APKS_DIR"
+
+    # Extract app name from package
+    local app_name=$(echo "$package" | rev | cut -d. -f1 | rev)
+    local base_name="${app_name}_v${version}"
+
+    # Pull APK(s)
+    local main_apk=""
+    local count=0
+
+    for apk_path in $apk_paths; do
+        apk_path=$(echo "$apk_path" | tr -d '\r\n')
+
+        if [ -z "$apk_path" ]; then
+            continue
+        fi
+
+        local filename=$(basename "$apk_path")
+        local output_file
+
+        if [ $count -eq 0 ]; then
+            # First/main APK
+            if echo "$filename" | grep -q "base"; then
+                output_file="${APKS_DIR}/${base_name}.apk"
+            else
+                output_file="${APKS_DIR}/${base_name}.apk"
+            fi
+            main_apk="$output_file"
+        else
+            # Split APKs
+            local split_name=$(echo "$filename" | sed 's/\.apk$//')
+            output_file="${APKS_DIR}/${base_name}_${split_name}.apk"
+        fi
+
+        log_info "Pulling: $apk_path"
+        adb pull "$apk_path" "$output_file" 2>/dev/null
+        count=$((count + 1))
+    done
+
+    log_success "Extracted $count APK file(s)"
+    echo "$main_apk"
+}
+
+#=============================================================================
+# Decompilation
+#=============================================================================
+
+decompile_apk() {
+    local apk_path="$1"
+    local apk_name=$(basename "$apk_path" .apk)
+    local output_dir="${DECOMPILED_DIR}/${apk_name}/jadx"
+
+    log_section "Decompiling: $apk_name"
+
+    if [ -d "$output_dir" ] && [ "$(ls -A $output_dir 2>/dev/null)" ]; then
+        log_warn "Already decompiled, skipping. Delete $output_dir to re-decompile"
+    else
+        mkdir -p "$output_dir"
+        log_info "Running jadx (this may take a minute)..."
+        jadx -d "$output_dir" "$apk_path" 2>&1 | grep -E "(INFO|ERROR|progress)" || true
+        log_success "Decompilation complete"
+    fi
+
+    echo "$output_dir"
+}
+
+#=============================================================================
+# API Analysis Functions
+#=============================================================================
+
+find_urls() {
+    local source_dir="$1"
+    local output_file="$2"
+
+    log_info "Searching for URLs..."
+
+    # Find all URLs, filter out common non-API URLs
+    grep -rhoE 'https?://[^"'\''<>\s]+' "$source_dir" 2>/dev/null | \
+        sort -u | \
+        grep -vE '(github\.com|mozilla\.org|w3\.org|schema\.org|apache\.org|google\.com/(maps|fonts|android)|googleapis\.com/auth|facebook\.com|reactjs\.org|reactnative|developer\.|stackoverflow|xml\.org|webkit\.org|csswg\.org|microsoft\.com|msdn\.|play\.google\.com/store)' | \
+        grep -vE '\.(png|jpg|gif|svg|css|js|woff|ttf|eot)$' \
+        > "$output_file" 2>/dev/null || true
+
+    local count=$(wc -l < "$output_file" | tr -d ' ')
+    log_success "Found $count unique URLs"
+}
+
+find_api_endpoints() {
+    local source_dir="$1"
+    local output_file="$2"
+
+    log_info "Searching for API endpoints..."
+
+    # Look for REST-style endpoint patterns
+    {
+        # postData/getData patterns (React Native)
+        grep -rhoE "(postData|getData|fetch|axios\.[a-z]+)\s*\(['\"][^'\"]+['\"]" "$source_dir" 2>/dev/null | \
+            grep -oE "['\"][^'\"]+['\"]" | tr -d "'\""
+
+        # URL path patterns
+        grep -rhoE '["'\'']/[a-z_]+(/[a-z_]+)*["'\'']' "$source_dir" 2>/dev/null | \
+            tr -d "\"'" | grep -E '^/[a-z]'
+
+        # API route definitions
+        grep -rhoE '(route|path|endpoint|url)\s*[=:]\s*["\x27][^"\x27]+["\x27]' "$source_dir" 2>/dev/null | \
+            grep -oE '["\x27][^"\x27]+["\x27]' | tr -d "\"'"
+
+    } | sort -u | grep -vE '^/(node_modules|assets|static|fonts|images|css|js)' > "$output_file" 2>/dev/null || true
+
+    local count=$(wc -l < "$output_file" | tr -d ' ')
+    log_success "Found $count potential endpoints"
+}
+
+find_api_keys() {
+    local source_dir="$1"
+    local output_file="$2"
+
+    log_info "Searching for API keys and secrets..."
+
+    {
+        echo "# API Keys and Secrets Found"
+        echo ""
+
+        # Google API Keys
+        echo "## Google API Keys"
+        grep -rhoE 'AIza[a-zA-Z0-9_-]{35}' "$source_dir" 2>/dev/null | sort -u | while read key; do
+            echo "- \`$key\`"
+        done
+        echo ""
+
+        # AWS Keys
+        echo "## AWS Keys"
+        grep -rhoE 'AKIA[A-Z0-9]{16}' "$source_dir" 2>/dev/null | sort -u | while read key; do
+            echo "- \`$key\`"
+        done
+        echo ""
+
+        # Firebase
+        echo "## Firebase"
+        grep -rhoE '[a-z0-9-]+\.firebaseio\.com|[a-z0-9-]+\.firebaseapp\.com' "$source_dir" 2>/dev/null | sort -u | while read key; do
+            echo "- \`$key\`"
+        done
+        echo ""
+
+        # Generic API keys in code
+        echo "## Other Keys (from code)"
+        grep -rhoE '(api_key|apikey|api-key|apiKey)\s*[=:]\s*["\x27][^"\x27]{10,}["\x27]' "$source_dir" 2>/dev/null | sort -u | head -20 | while read key; do
+            echo "- \`$key\`"
+        done
+        echo ""
+
+        # Keys in AndroidManifest
+        echo "## Keys from AndroidManifest.xml"
+        if [ -f "${source_dir}/resources/AndroidManifest.xml" ]; then
+            grep -oE 'android:value="[^"]+' "${source_dir}/resources/AndroidManifest.xml" 2>/dev/null | \
+                grep -iE '(key|secret|token|api)' | sed 's/android:value="/- `/' | sed 's/$/$`/'
+        fi
+        echo ""
+
+    } > "$output_file"
+
+    log_success "API key search complete"
+}
+
+find_auth_patterns() {
+    local source_dir="$1"
+    local output_file="$2"
+
+    log_info "Searching for authentication patterns..."
+
+    {
+        echo "# Authentication Patterns"
+        echo ""
+
+        # Login/auth endpoints
+        echo "## Authentication Endpoints"
+        grep -rhoE '["\x27]/(auth|login|signin|signup|register|oauth|token|session)[^"\x27]*["\x27]' "$source_dir" 2>/dev/null | \
+            tr -d "\"'" | sort -u | while read ep; do
+            echo "- \`$ep\`"
+        done
+        echo ""
+
+        # Auth headers
+        echo "## Authentication Headers"
+        grep -rhoE '(Authorization|Bearer|X-Api-Key|X-Auth-Token|api_key|access_token)[^,\}]*' "$source_dir" 2>/dev/null | \
+            sort -u | head -20 | while read h; do
+            echo "- \`$h\`"
+        done
+        echo ""
+
+        # Token storage
+        echo "## Token Storage Keys"
+        grep -rhoE '(localStorage|AsyncStorage|SharedPreferences)[^)]*\(["\x27][^"\x27]+["\x27]' "$source_dir" 2>/dev/null | \
+            grep -oE '["\x27][^"\x27]+["\x27]' | tr -d "\"'" | sort -u | while read k; do
+            echo "- \`$k\`"
+        done
+        echo ""
+
+        # Password/credential fields
+        echo "## Credential Fields"
+        grep -rhoE '(password|credential|secret|token|email|username)["\x27]?\s*[=:]\s*[^,\n]+' "$source_dir" 2>/dev/null | \
+            grep -v 'password.*password' | sort -u | head -20 | while read f; do
+            echo "- \`$f\`"
+        done
+        echo ""
+
+    } > "$output_file"
+
+    log_success "Authentication analysis complete"
+}
+
+find_request_patterns() {
+    local source_dir="$1"
+    local output_file="$2"
+
+    log_info "Analyzing request patterns..."
+
+    {
+        echo "# Request Patterns"
+        echo ""
+
+        # Headers
+        echo "## HTTP Headers Used"
+        grep -rhoE '(Accept|Content-Type|Authorization|User-Agent|X-[A-Za-z-]+)["\x27]?\s*[=:]\s*["\x27][^"\x27]+["\x27]' "$source_dir" 2>/dev/null | \
+            sort -u | head -30 | while read h; do
+            echo "- \`$h\`"
+        done
+        echo ""
+
+        # HTTP Methods
+        echo "## HTTP Methods"
+        grep -rhoE "method\s*[=:]\s*['\"][A-Z]+['\"]" "$source_dir" 2>/dev/null | \
+            sort | uniq -c | sort -rn | while read count method; do
+            echo "- $method ($count occurrences)"
+        done
+        echo ""
+
+        # Base URLs
+        echo "## Base URLs"
+        grep -rhoE '(baseURL|BASE_URL|apiUrl|API_URL|host)\s*[=:]\s*["\x27][^"\x27]+["\x27]' "$source_dir" 2>/dev/null | \
+            sort -u | while read u; do
+            echo "- \`$u\`"
+        done
+        echo ""
+
+        # Query parameters
+        echo "## Common Query Parameters"
+        grep -rhoE '\?[a-zA-Z_]+=' "$source_dir" 2>/dev/null | \
+            sed 's/\?//' | sed 's/=//' | sort | uniq -c | sort -rn | head -20 | while read count param; do
+            echo "- \`$param\` ($count occurrences)"
+        done
+        echo ""
+
+    } > "$output_file"
+
+    log_success "Request pattern analysis complete"
+}
+
+find_data_models() {
+    local source_dir="$1"
+    local output_file="$2"
+
+    log_info "Extracting data models..."
+
+    {
+        echo "# Data Models"
+        echo ""
+
+        # JSON field names from code
+        echo "## JSON Fields (from request/response handling)"
+        grep -rhoE '(response|request|data|body)\.[a-zA-Z_]+' "$source_dir" 2>/dev/null | \
+            sed 's/.*\.//' | sort | uniq -c | sort -rn | head -50 | while read count field; do
+            echo "- \`$field\` ($count occurrences)"
+        done
+        echo ""
+
+        # Potential model classes
+        echo "## Potential Model Classes"
+        grep -rlE 'class\s+[A-Z][a-zA-Z]*(Model|Entity|DTO|Request|Response)' "$source_dir" 2>/dev/null | \
+            head -20 | while read f; do
+            local class=$(grep -oE 'class\s+[A-Z][a-zA-Z]*(Model|Entity|DTO|Request|Response)' "$f" | head -1)
+            echo "- \`$class\` in $(basename $f)"
+        done
+        echo ""
+
+    } > "$output_file"
+
+    log_success "Data model extraction complete"
+}
+
+#=============================================================================
+# Documentation Generation
+#=============================================================================
+
+generate_api_reference() {
+    local app_name="$1"
+    local urls_file="$2"
+    local endpoints_file="$3"
+    local output_file="$4"
+
+    log_info "Generating API reference..."
+
+    # Find the most likely base URL
+    local base_url=$(grep -E 'https?://[^/]+\.[^/]+/' "$urls_file" 2>/dev/null | \
+        grep -vE '(google|facebook|amazon|cloudfront|firebase|github|apple)' | \
+        head -1 | grep -oE 'https?://[^/]+')
+
+    cat > "$output_file" << EOF
+# ${app_name} API Reference
+
+## Overview
+
+This documentation was auto-generated by reverse engineering the ${app_name} Android application.
+
+**Use this documentation to interact with the API independently from the app.**
+
+---
+
+## Base URL
+
+\`\`\`
+${base_url:-"(Could not determine - check URLs below)"}
+\`\`\`
+
+---
+
+## Discovered URLs
+
+The following URLs were found in the application:
+
+| URL | Purpose |
+|-----|---------|
+EOF
+
+    # Add URLs to table
+    while IFS= read -r url; do
+        [ -z "$url" ] && continue
+        echo "| \`$url\` | |" >> "$output_file"
+    done < "$urls_file"
+
+    cat >> "$output_file" << 'EOF'
+
+---
+
+## API Endpoints
+
+The following endpoints were discovered:
+
+| Method | Endpoint | Parameters |
+|--------|----------|------------|
+EOF
+
+    # Add endpoints to table
+    while IFS= read -r endpoint; do
+        [ -z "$endpoint" ] && continue
+        echo "| POST/GET | \`$endpoint\` | |" >> "$output_file"
+    done < "$endpoints_file"
+
+    cat >> "$output_file" << 'EOF'
+
+---
+
+## Request Format
+
+### Headers
+
+Based on code analysis, requests likely require:
+
+```http
+Accept: application/json
+Content-Type: application/json
+```
+
+### Query Parameters
+
+Check the request patterns file for commonly used query parameters.
+
+---
+
+## cURL Example
+
+```bash
+# Replace with actual values from your analysis
+BASE_URL="https://api.example.com"
+ENDPOINT="/your_endpoint"
+
+curl -X POST "${BASE_URL}${ENDPOINT}" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"key": "value"}'
+```
+
+---
+
+## Files Generated
+
+- `api_reference.md` - This file
+- `authentication.md` - Auth patterns and tokens
+- `api_keys.md` - Discovered API keys
+- `request_patterns.md` - HTTP request details
+- `data_models.md` - JSON fields and models
+- `openapi/api.yaml` - OpenAPI specification
+
+---
+
+## Notes
+
+This documentation was generated automatically through static analysis.
+Some details may be incomplete or require manual verification.
+
+For best results:
+1. Use a proxy (Burp Suite) to capture actual traffic
+2. Combine with this documentation
+3. Test endpoints individually
+EOF
+
+    log_success "Generated: $output_file"
+}
+
+generate_openapi_spec() {
+    local app_name="$1"
+    local base_url="$2"
+    local endpoints_file="$3"
+    local output_file="$4"
+
+    log_info "Generating OpenAPI specification..."
+
+    mkdir -p "$(dirname "$output_file")"
+
+    cat > "$output_file" << EOF
+openapi: 3.0.3
+info:
+  title: ${app_name} API
+  description: |
+    Auto-generated API specification from reverse engineering.
+
+    **Note:** This spec was generated through static analysis and may be incomplete.
+    Verify endpoints with actual traffic capture.
+  version: "1.0.0"
+
+servers:
+  - url: ${base_url:-"https://api.example.com"}
+    description: Discovered API Server
+
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: query
+      name: api_key
+      description: API key (check authentication.md for details)
+
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication
+
+  schemas:
+    GenericRequest:
+      type: object
+      additionalProperties: true
+
+    GenericResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: string
+        response:
+          type: object
+          additionalProperties: true
+
+paths:
+EOF
+
+    # Add discovered endpoints
+    while IFS= read -r endpoint; do
+        [ -z "$endpoint" ] && continue
+
+        # Clean endpoint name for operationId
+        local op_id=$(echo "$endpoint" | tr '/' '_' | tr -d '?=' | sed 's/^_//')
+
+        cat >> "$output_file" << EOF
+  ${endpoint}:
+    post:
+      summary: ${endpoint}
+      operationId: ${op_id}
+      tags:
+        - Discovered Endpoints
+      requestBody:
+        content:
+          application/json:
+            schema:
+              \$ref: '#/components/schemas/GenericRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                \$ref: '#/components/schemas/GenericResponse'
+    get:
+      summary: ${endpoint}
+      operationId: get_${op_id}
+      tags:
+        - Discovered Endpoints
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                \$ref: '#/components/schemas/GenericResponse'
+
+EOF
+    done < "$endpoints_file"
+
+    log_success "Generated: $output_file"
+}
+
+generate_summary() {
+    local app_name="$1"
+    local docs_dir="$2"
+    local output_file="$3"
+
+    log_info "Generating summary..."
+
+    cat > "$output_file" << EOF
+# ${app_name} - API Extraction Summary
+
+## Generated Files
+
+| File | Description |
+|------|-------------|
+| [api_reference.md](./api_reference.md) | Complete API endpoint reference |
+| [authentication.md](./authentication.md) | Auth patterns, tokens, credentials |
+| [api_keys.md](./api_keys.md) | Discovered API keys and secrets |
+| [request_patterns.md](./request_patterns.md) | HTTP headers, methods, parameters |
+| [data_models.md](./data_models.md) | JSON fields and data structures |
+| [openapi/api.yaml](./openapi/api.yaml) | OpenAPI 3.0 specification |
+
+## Quick Start
+
+1. Review \`api_keys.md\` for any exposed credentials
+2. Check \`authentication.md\` for login flow
+3. Use \`api_reference.md\` for endpoint details
+4. Import \`openapi/api.yaml\` into Postman or Swagger
+
+## Generated By
+
+\`\`\`
+./api_extractor ${app_name}
+\`\`\`
+
+Date: $(date)
+EOF
+
+    log_success "Generated: $output_file"
+}
+
+#=============================================================================
+# Main Extraction Pipeline
+#=============================================================================
+
+run_extraction() {
+    local package="$1"
+    local apk_path="$2"
+
+    check_dependencies
+
+    # Step 1: Get APK
+    if [ -z "$apk_path" ]; then
+        apk_path=$(extract_apk "$package")
+    fi
+
+    # Trim whitespace
+    apk_path=$(echo "$apk_path" | tr -d '\n' | tail -1)
+
+    if [ -z "$apk_path" ] || [ ! -f "$apk_path" ]; then
+        log_error "APK not found: $apk_path"
+        exit 1
+    fi
+
+    local apk_name=$(basename "$apk_path" .apk)
+    local app_name=$(echo "$apk_name" | cut -d'_' -f1)
+
+    # Step 2: Decompile
+    local source_dir=$(decompile_apk "$apk_path")
+
+    if [ ! -d "$source_dir" ]; then
+        log_error "Decompilation failed"
+        exit 1
+    fi
+
+    # Step 3: Create output directory
+    local output_dir="${DOCS_DIR}/${app_name}"
+    mkdir -p "$output_dir"
+    mkdir -p "$output_dir/openapi"
+
+    # Step 4: Analysis
+    log_section "Analyzing Application"
+
+    local urls_file=$(mktemp)
+    local endpoints_file=$(mktemp)
+
+    find_urls "$source_dir" "$urls_file"
+    find_api_endpoints "$source_dir" "$endpoints_file"
+    find_api_keys "$source_dir" "$output_dir/api_keys.md"
+    find_auth_patterns "$source_dir" "$output_dir/authentication.md"
+    find_request_patterns "$source_dir" "$output_dir/request_patterns.md"
+    find_data_models "$source_dir" "$output_dir/data_models.md"
+
+    # Step 5: Generate Documentation
+    log_section "Generating Documentation"
+
+    # Find base URL for OpenAPI
+    local base_url=$(grep -E 'https?://[^/]+\.[^/]+/' "$urls_file" 2>/dev/null | \
+        grep -vE '(google|facebook|amazon|cloudfront|firebase|github|apple|mozilla|microsoft)' | \
+        head -1 | grep -oE 'https?://[^/]+')
+
+    generate_api_reference "$app_name" "$urls_file" "$endpoints_file" "$output_dir/api_reference.md"
+    generate_openapi_spec "$app_name" "$base_url" "$endpoints_file" "$output_dir/openapi/api.yaml"
+    generate_summary "$app_name" "$output_dir" "$output_dir/README.md"
+
+    # Copy raw data
+    cp "$urls_file" "$output_dir/raw_urls.txt"
+    cp "$endpoints_file" "$output_dir/raw_endpoints.txt"
+
+    # Cleanup
+    rm -f "$urls_file" "$endpoints_file"
+
+    # Step 6: Summary
+    log_section "Extraction Complete"
+
+    echo "Documentation generated in: $output_dir"
+    echo ""
+    echo "Files created:"
+    ls -la "$output_dir"
+    echo ""
+    echo "Next steps:"
+    echo "  1. Review: cat $output_dir/README.md"
+    echo "  2. Check API keys: cat $output_dir/api_keys.md"
+    echo "  3. View endpoints: cat $output_dir/api_reference.md"
+    echo "  4. Import OpenAPI: $output_dir/openapi/api.yaml"
+}
+
+#=============================================================================
+# Entry Point
+#=============================================================================
+
+main() {
+    echo ""
+    echo "╔═══════════════════════════════════════════════════════════════╗"
+    echo "║              API Extractor - Android RE Tool                  ║"
+    echo "║         Extract APIs from Android Applications                ║"
+    echo "╚═══════════════════════════════════════════════════════════════╝"
+    echo ""
+
+    if [ $# -lt 1 ]; then
+        usage
+    fi
+
+    local package=""
+    local apk_path=""
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --apk)
+                apk_path="$2"
+                shift 2
+                ;;
+            --help|-h)
+                usage
+                ;;
+            *)
+                package="$1"
+                shift
+                ;;
+        esac
+    done
+
+    if [ -z "$package" ] && [ -z "$apk_path" ]; then
+        usage
+    fi
+
+    run_extraction "$package" "$apk_path"
+}
+
+main "$@"

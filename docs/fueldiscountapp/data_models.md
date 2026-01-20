@@ -1,0 +1,76 @@
+# Data Models
+
+## JSON Fields (from request/response handling)
+- `deserialization` (121 occurrences)
+- `ProtoBuf` (87 occurrences)
+- `jvm` (65 occurrences)
+- `ImageRequest` (44 occurrences)
+- `geojson` (41 occurrences)
+- `FastJsonResponse` (40 occurrences)
+- `body` (36 occurrences)
+- `kml` (33 occurrences)
+- `header` (27 occurrences)
+- `data` (27 occurrences)
+- `request` (23 occurrences)
+- `length` (23 occurrences)
+- `Geometry` (22 occurrences)
+- `DataBuffer` (20 occurrences)
+- `code` (20 occurrences)
+- `headers` (18 occurrences)
+- `BasePostprocessor` (17 occurrences)
+- `url` (16 occurrences)
+- `Postprocessor` (16 occurrences)
+- `FastParser` (16 occurrences)
+- `invoke` (15 occurrences)
+- `getString` (12 occurrences)
+- `api_key` (11 occurrences)
+- `putString` (10 occurrences)
+- `method` (9 occurrences)
+- `Layer` (9 occurrences)
+- `ImageRequestBuilder` (9 occurrences)
+- `getBundle` (9 occurrences)
+- `Builder` (9 occurrences)
+- `Feature` (8 occurrences)
+- `DataBufferObserver` (8 occurrences)
+- `newBuilder` (7 occurrences)
+- `MultiGeometry` (7 occurrences)
+- `priorResponse` (6 occurrences)
+- `getInt` (6 occurrences)
+- `DataPolygon` (6 occurrences)
+- `DataHolder` (6 occurrences)
+- `cacheControl` (6 occurrences)
+- `toString` (5 occurrences)
+- `Style` (5 occurrences)
+- `Renderer` (5 occurrences)
+- `networkResponse` (5 occurrences)
+- `kt` (5 occurrences)
+- `close` (5 occurrences)
+- `type` (4 occurrences)
+- `size` (4 occurrences)
+- `putLong` (4 occurrences)
+- `protocol` (4 occurrences)
+- `message` (4 occurrences)
+- `m` (4 occurrences)
+
+## Potential Model Classes
+- `class InflateRequest` in AsyncLayoutInflater.java
+- `class SafeBrowsingResponse` in SafeBrowsingResponseCompat.java
+- `class WebResourceRequest` in WebResourceRequestAdapter.java
+- `class SafeBrowsingResponse` in SafeBrowsingResponseImpl.java
+- `class WebResourceRequest` in WebResourceRequestCompat.java
+- `class FontRequest` in FontsContractCompat.java
+- `class FontRequest` in FontRequest.java
+- `class ViewModel` in ViewModelStore.java
+- `class SavedStateViewModel` in SavedStateViewModelFactory.java
+- `class ViewModel` in ViewModelProvider.java
+- `class ViewModel` in ViewModel.java
+- `class AndroidViewModel` in AndroidViewModel.java
+- `class AbstractSavedStateViewModel` in AbstractSavedStateViewModelFactory.java
+- `class FragmentManagerViewModel` in FragmentManagerViewModel.java
+- `class LoaderViewModel` in LoaderManagerImpl.java
+- `class ShareActivityChooserModel` in ShareActionProvider.java
+- `class ActivityChooserModel` in ActivityChooserModel.java
+- `class PermissionsResponse` in PermissionsResponse.java
+- `class NumericEntity` in NumericEntityUnescaper.java
+- `class NumericEntity` in NumericEntityEscaper.java
+
