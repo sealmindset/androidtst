@@ -1,0 +1,174 @@
+openapi: 3.0.3
+info:
+  title: Open Roads External Services
+  description: |
+    External web services and static content accessed by the Open Roads app.
+
+    These are not API endpoints but web URLs for content and portals.
+  version: "1.0"
+
+servers:
+  - url: https://hydrocarbon-xl.herokuapp.com
+    description: Static Content Server
+  - url: https://apply.myopenroads.com
+    description: Account Portal
+  - url: https://myopenroads.com
+    description: Marketing Website
+  - url: https://d1wp6m56sqw74a.cloudfront.net
+    description: CDN for Assets
+  - url: https://tsdv.loadtracking.com
+    description: Load Tracking Service
+
+paths:
+  /tsd/terms.txt:
+    get:
+      summary: Terms of Service
+      description: Plain text Terms of Service document
+      operationId: getTermsOfService
+      tags:
+        - Static Content
+      servers:
+        - url: https://hydrocarbon-xl.herokuapp.com
+      security: []
+      responses:
+        '200':
+          description: Terms of Service text
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /tsd/privacy.txt:
+    get:
+      summary: Privacy Policy
+      description: Plain text Privacy Policy document
+      operationId: getPrivacyPolicy
+      tags:
+        - Static Content
+      servers:
+        - url: https://hydrocarbon-xl.herokuapp.com
+      security: []
+      responses:
+        '200':
+          description: Privacy Policy text
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /tsd/TSD-RV-App-and-Setting-up-Pin.pdf:
+    get:
+      summary: Setup Guide PDF
+      description: PDF guide for setting up the app and PIN
+      operationId: getSetupGuide
+      tags:
+        - Static Content
+      servers:
+        - url: https://hydrocarbon-xl.herokuapp.com
+      security: []
+      responses:
+        '200':
+          description: PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /user-portal/account-deletion-request:
+    get:
+      summary: Account Deletion Request
+      description: |
+        Web page for requesting account deletion.
+        Requires api_key parameter for authentication.
+      operationId: accountDeletionRequest
+      tags:
+        - Account Portal
+      servers:
+        - url: https://apply.myopenroads.com
+      parameters:
+        - name: api_key
+          in: query
+          required: true
+          schema:
+            type: string
+          description: User's session API key
+      responses:
+        '200':
+          description: Account deletion request page
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /loves:
+    get:
+      summary: Love's Partnership Info
+      description: Information about Love's Travel Stops partnership
+      operationId: getLovesInfo
+      tags:
+        - Marketing
+      servers:
+        - url: https://myopenroads.com
+      security: []
+      responses:
+        '200':
+          description: Love's partnership page
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /vip-access:
+    get:
+      summary: VIP Access Info
+      description: Information about VIP access program
+      operationId: getVipAccessInfo
+      tags:
+        - Marketing
+      servers:
+        - url: https://myopenroads.com
+      security: []
+      responses:
+        '200':
+          description: VIP access page
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /~assets/{path}:
+    get:
+      summary: CDN Assets
+      description: Static assets served from CloudFront CDN
+      operationId: getCdnAsset
+      tags:
+        - CDN
+      servers:
+        - url: https://d1wp6m56sqw74a.cloudfront.net
+      security: []
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Asset path
+      responses:
+        '200':
+          description: Asset file
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+
+tags:
+  - name: Static Content
+    description: Static documents and legal content
+  - name: Account Portal
+    description: Web portal for account management
+  - name: Marketing
+    description: Marketing website pages
+  - name: CDN
+    description: Content Delivery Network assets

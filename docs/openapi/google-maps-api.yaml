@@ -1,0 +1,229 @@
+openapi: 3.0.3
+info:
+  title: Google Maps Directions API (Open Roads Usage)
+  description: |
+    Google Maps Directions API as used by the Open Roads app.
+
+    **API Key Found in APK:**
+    ```
+    AIzaSyBLBLDA-kIki0Dcqe05LmIY8IfQ2kxaiLw
+    ```
+
+    This key is embedded in the AndroidManifest.xml and used for route planning.
+  version: "1.0"
+  contact:
+    name: Google Cloud
+    url: https://developers.google.com/maps
+
+servers:
+  - url: https://maps.googleapis.com/maps/api
+    description: Google Maps API
+
+security:
+  - apiKey: []
+
+paths:
+  /directions/json:
+    get:
+      summary: Get Directions
+      description: |
+        Calculate directions between locations.
+
+        Used by Open Roads to:
+        - Plan routes between fuel stops
+        - Calculate distances and durations
+        - Find optimal fuel stop locations along route
+      operationId: getDirections
+      tags:
+        - Directions
+      parameters:
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Starting point (address or lat,lng)
+          example: "37.7749,-122.4194"
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Ending point (address or lat,lng)
+          example: "34.0522,-118.2437"
+        - name: waypoints
+          in: query
+          schema:
+            type: string
+          description: Intermediate waypoints (pipe-separated)
+          example: "via:36.7783,-119.4179|via:35.3733,-119.0187"
+        - name: mode
+          in: query
+          schema:
+            type: string
+            enum: [DRIVING, BICYCLING, TRANSIT, WALKING]
+            default: DRIVING
+          description: Travel mode
+        - name: language
+          in: query
+          schema:
+            type: string
+            default: en
+          description: Language for results
+        - name: region
+          in: query
+          schema:
+            type: string
+          description: Region bias (ccTLD)
+        - name: key
+          in: query
+          required: true
+          schema:
+            type: string
+          description: API key
+          example: AIzaSyBLBLDA-kIki0Dcqe05LmIY8IfQ2kxaiLw
+      responses:
+        '200':
+          description: Directions response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectionsResponse'
+        '400':
+          description: Invalid request
+        '403':
+          description: API key invalid or quota exceeded
+
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: query
+      name: key
+      description: |
+        Google Maps API Key
+
+        **Key found in Open Roads APK:**
+        `AIzaSyBLBLDA-kIki0Dcqe05LmIY8IfQ2kxaiLw`
+
+  schemas:
+    DirectionsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [OK, NOT_FOUND, ZERO_RESULTS, MAX_WAYPOINTS_EXCEEDED, INVALID_REQUEST, OVER_DAILY_LIMIT, OVER_QUERY_LIMIT, REQUEST_DENIED, UNKNOWN_ERROR]
+        routes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+        geocoded_waypoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeocodedWaypoint'
+
+    Route:
+      type: object
+      properties:
+        summary:
+          type: string
+        legs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Leg'
+        overview_polyline:
+          type: object
+          properties:
+            points:
+              type: string
+        bounds:
+          $ref: '#/components/schemas/Bounds'
+        copyrights:
+          type: string
+        warnings:
+          type: array
+          items:
+            type: string
+
+    Leg:
+      type: object
+      properties:
+        distance:
+          $ref: '#/components/schemas/TextValue'
+        duration:
+          $ref: '#/components/schemas/TextValue'
+        start_address:
+          type: string
+        end_address:
+          type: string
+        start_location:
+          $ref: '#/components/schemas/LatLng'
+        end_location:
+          $ref: '#/components/schemas/LatLng'
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/Step'
+
+    Step:
+      type: object
+      properties:
+        distance:
+          $ref: '#/components/schemas/TextValue'
+        duration:
+          $ref: '#/components/schemas/TextValue'
+        start_location:
+          $ref: '#/components/schemas/LatLng'
+        end_location:
+          $ref: '#/components/schemas/LatLng'
+        html_instructions:
+          type: string
+        travel_mode:
+          type: string
+        polyline:
+          type: object
+          properties:
+            points:
+              type: string
+
+    GeocodedWaypoint:
+      type: object
+      properties:
+        geocoder_status:
+          type: string
+        place_id:
+          type: string
+        types:
+          type: array
+          items:
+            type: string
+
+    TextValue:
+      type: object
+      properties:
+        text:
+          type: string
+        value:
+          type: integer
+
+    LatLng:
+      type: object
+      properties:
+        lat:
+          type: number
+          format: double
+        lng:
+          type: number
+          format: double
+
+    Bounds:
+      type: object
+      properties:
+        northeast:
+          $ref: '#/components/schemas/LatLng'
+        southwest:
+          $ref: '#/components/schemas/LatLng'
+
+tags:
+  - name: Directions
+    description: Route planning and directions

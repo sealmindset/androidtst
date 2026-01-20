@@ -1,0 +1,1153 @@
+openapi: 3.0.3
+info:
+  title: Open Roads Fuel Discount API
+  description: |
+    REST API for the Open Roads fuel discount mobile application.
+
+    ## Authentication
+    Most endpoints require an `api_key` query parameter obtained from the `/authenticate` endpoint.
+
+    ## Base URL
+    All endpoints are relative to `https://hydrocarbon-xl.herokuapp.com/`
+  version: 1.3.6
+  contact:
+    name: Open Roads
+    url: https://myopenroads.com
+
+servers:
+  - url: https://hydrocarbon-xl.herokuapp.com
+    description: Production API Server
+
+security:
+  - apiKeyQuery: []
+
+paths:
+  /authenticate:
+    post:
+      summary: User Login
+      description: Authenticate with email and password to obtain an API key
+      operationId: authenticate
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /register:
+    post:
+      summary: User Registration
+      description: Create a new user account
+      operationId: register
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Successful registration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /verify_two_factor_code:
+    post:
+      summary: Verify 2FA Code
+      description: Verify two-factor authentication code
+      operationId: verifyTwoFactorCode
+      tags:
+        - Authentication
+      parameters:
+        - name: api_key
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Temporary API key from initial auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorVerifyRequest'
+      responses:
+        '200':
+          description: 2FA verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /send_two_factor_code:
+    post:
+      summary: Send 2FA Code
+      description: Request a two-factor authentication code
+      operationId: sendTwoFactorCode
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorSendRequest'
+      responses:
+        '200':
+          description: Code sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /generate_password_reset_code:
+    post:
+      summary: Request Password Reset
+      description: Generate and send a password reset code
+      operationId: generatePasswordResetCode
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        '200':
+          description: Reset code sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /verify_password_reset_code:
+    post:
+      summary: Verify Password Reset Code
+      description: Verify the password reset code and get a change token
+      operationId: verifyPasswordResetCode
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetVerifyRequest'
+      responses:
+        '200':
+          description: Code verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordChangeTokenResponse'
+
+  /change_password:
+    post:
+      summary: Change Password
+      description: Change password for authenticated user
+      operationId: changePassword
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /change_expired_password:
+    post:
+      summary: Change Expired Password
+      description: Change password using reset token
+      operationId: changeExpiredPassword
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeExpiredPasswordRequest'
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /save_account_profile_info:
+    post:
+      summary: Update Profile
+      description: Save user account profile information
+      operationId: saveAccountProfileInfo
+      tags:
+        - Account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileInfoRequest'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /account_cards:
+    get:
+      summary: Get Account Cards
+      description: Get linked fuel cards for the account
+      operationId: getAccountCards
+      tags:
+        - Account
+      responses:
+        '200':
+          description: List of cards
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountCardsResponse'
+
+  /link_existing_account_card:
+    post:
+      summary: Link Fuel Card
+      description: Link an existing fuel card to the account
+      operationId: linkExistingAccountCard
+      tags:
+        - Account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkCardRequest'
+      responses:
+        '200':
+          description: Card linked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /find_all_nearby_gas_locations:
+    post:
+      summary: Find Nearby Gas Stations
+      description: Find all gas stations near a location
+      operationId: findAllNearbyGasLocations
+      tags:
+        - Fuel Locations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NearbyLocationsRequest'
+      responses:
+        '200':
+          description: List of nearby locations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationsResponse'
+
+  /find_better_prices_within_range:
+    post:
+      summary: Find Better Fuel Prices
+      description: Find stations with better prices within range
+      operationId: findBetterPricesWithinRange
+      tags:
+        - Fuel Locations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BetterPricesRequest'
+      responses:
+        '200':
+          description: Locations with better prices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationsResponse'
+
+  /get_locations_for_route:
+    post:
+      summary: Get Locations for Route
+      description: Get fuel stations along a planned route
+      operationId: getLocationsForRoute
+      tags:
+        - Fuel Locations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteLocationsRequest'
+      responses:
+        '200':
+          description: Locations along route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationsResponse'
+
+  /search_city_state:
+    post:
+      summary: Search by City/State
+      description: Search for locations by city and state
+      operationId: searchCityState
+      tags:
+        - Fuel Locations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CityStateSearchRequest'
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationsResponse'
+
+  /get_fuel_price_location_details:
+    get:
+      summary: Get Location Details
+      description: Get detailed information about a fuel location
+      operationId: getFuelPriceLocationDetails
+      tags:
+        - Fuel Locations
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Location ID
+      responses:
+        '200':
+          description: Location details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationDetailResponse'
+
+  /get_merchants:
+    get:
+      summary: Get Merchants
+      description: Get list of fuel merchants/brands
+      operationId: getMerchants
+      tags:
+        - Fuel Locations
+      responses:
+        '200':
+          description: List of merchants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantsResponse'
+
+  /get_all_location_special_events:
+    post:
+      summary: Get Special Events
+      description: Get promotions and special events at locations
+      operationId: getAllLocationSpecialEvents
+      tags:
+        - Fuel Locations
+      responses:
+        '200':
+          description: Special events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialEventsResponse'
+
+  /get_brand_images:
+    get:
+      summary: Get All Brand Images
+      description: Get logos for all fuel brands
+      operationId: getBrandImages
+      tags:
+        - Brands
+      responses:
+        '200':
+          description: Brand images
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandImagesResponse'
+
+  /get_brand_image:
+    get:
+      summary: Get Brand Image
+      description: Get logo for a specific brand
+      operationId: getBrandImage
+      tags:
+        - Brands
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Brand ID
+      responses:
+        '200':
+          description: Brand image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandImageResponse'
+
+  /get_partners_with_content:
+    get:
+      summary: Get Partners
+      description: Get partner information with content
+      operationId: getPartnersWithContent
+      tags:
+        - Partners
+      responses:
+        '200':
+          description: Partner list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnersResponse'
+
+  /get_partner_vip_interstitial/{id}:
+    get:
+      summary: Get Partner VIP Details
+      description: Get VIP interstitial content for a partner
+      operationId: getPartnerVipInterstitial
+      tags:
+        - Partners
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Partner ID
+      responses:
+        '200':
+          description: Partner VIP details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerVipResponse'
+
+  /get_partner_map_content/{id}:
+    post:
+      summary: Get Partner Map Content
+      description: Get map content for a partner
+      operationId: getPartnerMapContent
+      tags:
+        - Partners
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Partner ID
+      responses:
+        '200':
+          description: Partner map content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerMapContentResponse'
+
+  /get_vip_offers:
+    post:
+      summary: Get VIP Offers
+      description: Get available VIP discount offers
+      operationId: getVipOffers
+      tags:
+        - Partners
+      responses:
+        '200':
+          description: VIP offers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VipOffersResponse'
+
+  /get_fuel_transactions_for_card_paged:
+    post:
+      summary: Get Transactions
+      description: Get paginated fuel transactions for a card
+      operationId: getFuelTransactionsForCardPaged
+      tags:
+        - Transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionsRequest'
+      responses:
+        '200':
+          description: Transaction list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsResponse'
+
+  /get_charity_project_info:
+    post:
+      summary: Get Charity Project
+      description: Get information about charity water project
+      operationId: getCharityProjectInfo
+      tags:
+        - Impact
+      responses:
+        '200':
+          description: Charity project info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CharityProjectResponse'
+
+  /save_fuel_program_application:
+    post:
+      summary: Apply for Fuel Program
+      description: Submit fuel program application
+      operationId: saveFuelProgramApplication
+      tags:
+        - Programs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FuelProgramApplicationRequest'
+      responses:
+        '200':
+          description: Application submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /save_insurance_program_application:
+    post:
+      summary: Apply for Insurance Program
+      description: Submit insurance program application
+      operationId: saveInsuranceProgramApplication
+      tags:
+        - Programs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsuranceProgramApplicationRequest'
+      responses:
+        '200':
+          description: Application submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /generate_loves_connect_code:
+    post:
+      summary: Generate Love's Connect Code
+      description: Generate a connection code for Love's
+      operationId: generateLovesConnectCode
+      tags:
+        - Programs
+      responses:
+        '200':
+          description: Connect code generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LovesConnectCodeResponse'
+
+  /log_get_directions:
+    post:
+      summary: Log Directions Request
+      description: Log when user requests directions
+      operationId: logGetDirections
+      tags:
+        - Analytics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogDirectionsRequest'
+      responses:
+        '200':
+          description: Logged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /log_view_better_prices:
+    post:
+      summary: Log Better Prices View
+      description: Log when user views better prices
+      operationId: logViewBetterPrices
+      tags:
+        - Analytics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogBetterPricesRequest'
+      responses:
+        '200':
+          description: Logged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /log_view_transaction_details:
+    post:
+      summary: Log Transaction View
+      description: Log when user views transaction details
+      operationId: logViewTransactionDetails
+      tags:
+        - Analytics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogTransactionRequest'
+      responses:
+        '200':
+          description: Logged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /create_user_ticket:
+    post:
+      summary: Create Support Ticket
+      description: Submit a support ticket
+      operationId: createUserTicket
+      tags:
+        - Support
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportTicketRequest'
+      responses:
+        '200':
+          description: Ticket created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+components:
+  securitySchemes:
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: Session API key obtained from /authenticate
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: secretpassword
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - password_confirmation
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        password_confirmation:
+          type: string
+          format: password
+
+    TwoFactorVerifyRequest:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: "123456"
+
+    TwoFactorSendRequest:
+      type: object
+      required:
+        - method
+      properties:
+        method:
+          type: string
+          enum: [email, sms]
+
+    PasswordResetRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+
+    PasswordResetVerifyRequest:
+      type: object
+      required:
+        - email
+        - code
+      properties:
+        email:
+          type: string
+          format: email
+        code:
+          type: string
+
+    ChangePasswordRequest:
+      type: object
+      required:
+        - current_password
+        - password
+        - password_confirmation
+      properties:
+        current_password:
+          type: string
+        password:
+          type: string
+        password_confirmation:
+          type: string
+
+    ChangeExpiredPasswordRequest:
+      type: object
+      required:
+        - email
+        - password_change_token
+        - password
+        - password_confirmation
+      properties:
+        email:
+          type: string
+          format: email
+        password_change_token:
+          type: string
+        password:
+          type: string
+        password_confirmation:
+          type: string
+
+    ProfileInfoRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone:
+          type: string
+
+    LinkCardRequest:
+      type: object
+      required:
+        - card_number
+      properties:
+        card_number:
+          type: string
+
+    NearbyLocationsRequest:
+      type: object
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        radius:
+          type: number
+
+    BetterPricesRequest:
+      type: object
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+        fuel_type:
+          type: string
+
+    RouteLocationsRequest:
+      type: object
+      properties:
+        waypoints:
+          type: array
+          items:
+            type: object
+            properties:
+              latitude:
+                type: number
+              longitude:
+                type: number
+
+    CityStateSearchRequest:
+      type: object
+      properties:
+        city:
+          type: string
+        state:
+          type: string
+
+    TransactionsRequest:
+      type: object
+      properties:
+        card_id:
+          type: string
+        page:
+          type: integer
+        per_page:
+          type: integer
+
+    FuelProgramApplicationRequest:
+      type: object
+      properties:
+        application_data:
+          type: object
+
+    InsuranceProgramApplicationRequest:
+      type: object
+      properties:
+        application_data:
+          type: object
+
+    LogDirectionsRequest:
+      type: object
+      required:
+        - fuel_price_id
+      properties:
+        fuel_price_id:
+          type: string
+
+    LogBetterPricesRequest:
+      type: object
+      required:
+        - fuel_price_id
+      properties:
+        fuel_price_id:
+          type: string
+
+    LogTransactionRequest:
+      type: object
+      required:
+        - fuel_transaction_id
+      properties:
+        fuel_transaction_id:
+          type: string
+
+    SupportTicketRequest:
+      type: object
+      required:
+        - subject
+        - message
+      properties:
+        subject:
+          type: string
+        message:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        api_key:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+        response:
+          type: object
+          properties:
+            api_key:
+              type: string
+            two_factor_auth_delivery_options:
+              type: array
+              items:
+                type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: string
+
+    PasswordChangeTokenResponse:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            password_change_token:
+              type: string
+
+    AccountCardsResponse:
+      type: object
+      properties:
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: string
+        card_number:
+          type: string
+        balance:
+          type: number
+
+    LocationsResponse:
+      type: object
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FuelLocation'
+
+    FuelLocation:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        diesel_price:
+          type: number
+        regular_price:
+          type: number
+        brand_id:
+          type: string
+
+    LocationDetailResponse:
+      type: object
+      properties:
+        location:
+          $ref: '#/components/schemas/FuelLocation'
+        amenities:
+          type: array
+          items:
+            type: string
+
+    MerchantsResponse:
+      type: object
+      properties:
+        merchants:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+
+    SpecialEventsResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            type: object
+
+    BrandImagesResponse:
+      type: object
+      properties:
+        images:
+          type: object
+          additionalProperties:
+            type: string
+
+    BrandImageResponse:
+      type: object
+      properties:
+        image_url:
+          type: string
+
+    PartnersResponse:
+      type: object
+      properties:
+        partners:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              content:
+                type: string
+
+    PartnerVipResponse:
+      type: object
+      properties:
+        partner:
+          type: object
+
+    PartnerMapContentResponse:
+      type: object
+      properties:
+        content:
+          type: object
+
+    VipOffersResponse:
+      type: object
+      properties:
+        offers:
+          type: array
+          items:
+            type: object
+
+    TransactionsResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        page:
+          type: integer
+        total_pages:
+          type: integer
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+          format: date-time
+        amount:
+          type: number
+        gallons:
+          type: number
+        location:
+          type: string
+
+    CharityProjectResponse:
+      type: object
+      properties:
+        project:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            url:
+              type: string
+
+    LovesConnectCodeResponse:
+      type: object
+      properties:
+        code:
+          type: string
+
+tags:
+  - name: Authentication
+    description: User authentication and account security
+  - name: Account
+    description: Account management and cards
+  - name: Fuel Locations
+    description: Gas station and fuel price operations
+  - name: Brands
+    description: Fuel brand images and information
+  - name: Partners
+    description: Partner and VIP content
+  - name: Transactions
+    description: Fuel transaction history
+  - name: Impact
+    description: Charity and impact projects
+  - name: Programs
+    description: Fuel and insurance program applications
+  - name: Analytics
+    description: Usage logging endpoints
+  - name: Support
+    description: Customer support
