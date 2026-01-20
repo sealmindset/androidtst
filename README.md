@@ -104,6 +104,8 @@ TARGET_PACKAGE=com.example.myapp python3 test_harness.py
 | `frida_root_bypass.js` | Frida script to bypass root detection |
 | `frida_emulator_bypass.js` | Frida script to bypass emulator detection |
 | `frida_ssl_bypass.js` | Frida script to bypass SSL pinning |
+| `frida_device_id_spoofer.js` | Frida script to spoof device ID for multi-device use |
+| `change-device-id.sh` | Change emulator android_id (no root/frida needed) |
 
 ## Proxy Integration
 
@@ -342,6 +344,53 @@ frida -U -l frida_emulator_bypass.js com.example.app
 - Native fopen() and access() for low-level file detection
 
 **Spoofed device:** Pixel 6 Pro (configurable in script)
+
+### Device ID Spoofer
+
+Apps with device limits (e.g., "only 2 devices allowed") track your device by `android_id` and other identifiers.
+
+#### Simple Method (Recommended)
+
+Use the `change-device-id.sh` script to change the emulator's `android_id`. No root or Frida required:
+
+```bash
+# Change device ID and clear app data (recommended)
+./change-device-id.sh --clear openroads.fueldiscountapp
+
+# Just change device ID (random)
+./change-device-id.sh
+
+# Use a specific ID
+./change-device-id.sh abc123def456789a
+
+# Then launch the app
+adb shell monkey -p openroads.fueldiscountapp 1
+```
+
+The app will now see the emulator as a completely different device, allowing you to use it alongside your real phone without hitting device limits.
+
+#### Frida Method (Advanced)
+
+For apps that check multiple identifiers or cache the device ID, use `frida_device_id_spoofer.js`:
+
+```bash
+# Spawn app with device ID spoofing
+frida -U -l frida_device_id_spoofer.js -f com.example.app
+
+# Use with SSL bypass to intercept traffic too
+frida -U -l frida_device_id_spoofer.js -l frida_ssl_bypass.js -f com.example.app
+```
+
+**What it spoofs:**
+- Settings.Secure `android_id` (primary device identifier)
+- TelephonyManager device IDs (IMEI, IMSI, SIM serial)
+- Build.SERIAL and Build.getSerial()
+- WiFi and Bluetooth MAC addresses
+- react-native-device-info library hooks (if present)
+
+**Configuration:** Edit `CUSTOM_DEVICE_ID` in the script to use a fixed ID instead of random.
+
+**Use case:** Run the same app on your real phone AND emulator simultaneously without hitting device limits. Each launch generates a new random device ID, making the emulator appear as a fresh device.
 
 ### SSL Pinning Bypass
 
